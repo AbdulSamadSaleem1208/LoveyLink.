@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Check, X, Loader2, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { approvePayment, rejectPayment } from "./actions";
 
 interface PaymentRequest {
     id: string;
@@ -52,37 +53,21 @@ export default function AdminPaymentsPage() {
 
     const handleAction = async (id: string, action: 'approve' | 'reject') => {
         setProcessingId(id);
-        const supabase = createClient();
 
         try {
-            // Update request status
-            const status = action === 'approve' ? 'approved' : 'rejected';
-            const { error: updateError } = await supabase
-                .from('payment_requests')
-                .update({ status })
-                .eq('id', id);
-
-            if (updateError) throw updateError;
-
+            let result;
             if (action === 'approve') {
-                // Find the user ID from the payment request
-                const payment = payments.find(p => p.id === id);
-                if (payment) {
-                    // Update user subscription status
-                    const { error: subError } = await supabase
-                        .from('users')
-                        .update({
-                            subscription_status: 'active',
-                            subscription_id: 'manual_easypaisa'
-                        })
-                        .eq('id', payment.user_id);
-
-                    if (subError) throw subError;
-                }
+                result = await approvePayment(id);
+            } else {
+                result = await rejectPayment(id);
             }
 
-            toast.success(`Payment ${status} successfully`);
-            fetchPayments(); // Refresh list
+            if (result.error) {
+                throw new Error(result.error);
+            }
+
+            toast.success(`Payment ${action}d successfully`);
+            fetchPayments(); // Refresh UI
         } catch (error: any) {
             console.error(error);
             toast.error(error.message || "Action failed");

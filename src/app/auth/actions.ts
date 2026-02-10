@@ -41,7 +41,7 @@ export async function signup(formData: FormData) {
         email: data.email,
         password: data.password,
         options: {
-            emailRedirectTo: "http://localhost:3000/auth/callback",
+            emailRedirectTo: `${origin}/auth/callback`,
             data: {
                 full_name: data.full_name,
             },
@@ -69,7 +69,7 @@ export async function resendVerificationEmail(email: string) {
         type: 'signup',
         email,
         options: {
-            emailRedirectTo: "http://localhost:3000/auth/callback",
+            emailRedirectTo: `${origin}/auth/callback`,
         },
     });
 
