@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
-import { Loader2, Download, ExternalLink } from "lucide-react";
+import { Loader2, Download, ExternalLink, Share2 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function QRDisplay({ url, title, message }: { url: string, title: string, message?: string }) {
     const [qrSrc, setQrSrc] = useState<string>("");
@@ -22,6 +23,29 @@ export default function QRDisplay({ url, title, message }: { url: string, title:
             errorCorrectionLevel: 'H'
         }).then(setQrSrc);
     }, [url, mode, message]);
+
+    const handleShare = async () => {
+        const data = mode === 'link' ? url : (message || "No message provided");
+        const shareData = {
+            title: title,
+            text: mode === 'link' ? `Check out this Love Page: ${title}` : message,
+            url: mode === 'link' ? url : undefined
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+                toast.success("Shared successfully!");
+            } else {
+                await navigator.clipboard.writeText(data);
+                toast.success(mode === 'link' ? "Link copied to clipboard!" : "Message copied to clipboard!");
+            }
+        } catch (err) {
+            console.error("Error sharing:", err);
+            // Fallback if share fails (e.g. user cancelled)
+            // toast.error("Failed to share"); // Optional, maybe too noisy if user just cancelled
+        }
+    };
 
     if (!qrSrc) return <Loader2 className="animate-spin h-8 w-8 text-red-primary" />;
 
@@ -48,6 +72,14 @@ export default function QRDisplay({ url, title, message }: { url: string, title:
             </div>
 
             <div className="flex space-x-3">
+                <button
+                    onClick={handleShare}
+                    className="flex items-center px-4 py-2 bg-pink-100 text-pink-600 rounded-full text-sm font-medium hover:bg-pink-200 transition-colors"
+                >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share
+                </button>
+
                 <a
                     href={qrSrc}
                     download={`love-page-qr-${title}-${mode}.png`}
