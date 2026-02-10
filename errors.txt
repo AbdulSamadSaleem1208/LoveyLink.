@@ -1,0 +1,6 @@
+next.config.ts(21,3): error TS2353: Object literal may only specify known properties, and 'eslint' does not exist in type 'NextConfig'.
+src/app/api/webhooks/stripe/route.ts(58,63): error TS2339: Property 'current_period_end' does not exist on type 'Subscription'.
+src/app/dashboard/success/[id]/page.tsx(14,28): error TS2552: Cannot find name 'createServerClient'. Did you mean 'createClient'?
+src/components/qr/QRDisplay.tsx(4,20): error TS7016: Could not find a declaration file for module 'qrcode'. 'C:/Users/Panda/Desktop/client_app/node_modules/qrcode/lib/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/qrcode` if it exists or add a new declaration (.d.ts) file containing `declare module 'qrcode';`
+src/lib/stripe/server.ts(4,5): error TS2322: Type '"2025-01-27.acacia"' is not assignable to type '"2026-01-28.clover"'.

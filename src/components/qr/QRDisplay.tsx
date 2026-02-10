@@ -1,0 +1,78 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import QRCode from "qrcode";
+import { Loader2, Download, ExternalLink } from "lucide-react";
+import Link from "next/link";
+
+export default function QRDisplay({ url, title, message }: { url: string, title: string, message?: string }) {
+    const [qrSrc, setQrSrc] = useState<string>("");
+    const [mode, setMode] = useState<'link' | 'text'>('link');
+
+    useEffect(() => {
+        const data = mode === 'link' ? url : (message || "No message provided");
+
+        QRCode.toDataURL(data, {
+            width: 400,
+            margin: 2,
+            color: {
+                dark: "#9B1C1C", // Red primary
+                light: "#FFF1F2", // Blush background
+            },
+            errorCorrectionLevel: 'H'
+        }).then(setQrSrc);
+    }, [url, mode, message]);
+
+    if (!qrSrc) return <Loader2 className="animate-spin h-8 w-8 text-red-primary" />;
+
+    return (
+        <div className="flex flex-col items-center space-y-4">
+            <div className="bg-white p-4 rounded-xl shadow-lg border-2 border-red-100">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={qrSrc} alt={`QR Code for ${title}`} className="w-64 h-64 md:w-80 md:h-80" />
+            </div>
+
+            <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+                <button
+                    onClick={() => setMode('link')}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${mode === 'link' ? 'bg-white shadow text-red-primary' : 'text-gray-500 hover:text-gray-900'}`}
+                >
+                    Link to Page
+                </button>
+                <button
+                    onClick={() => setMode('text')}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${mode === 'text' ? 'bg-white shadow text-red-primary' : 'text-gray-500 hover:text-gray-900'}`}
+                >
+                    Message Only
+                </button>
+            </div>
+
+            <div className="flex space-x-3">
+                <a
+                    href={qrSrc}
+                    download={`love-page-qr-${title}-${mode}.png`}
+                    className="flex items-center px-4 py-2 bg-red-primary text-white rounded-full text-sm font-medium hover:bg-red-accent transition-colors"
+                >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download QR
+                </a>
+                {mode === 'link' && (
+                    <Link
+                        href={url}
+                        target="_blank"
+                        className="flex items-center px-4 py-2 border border-red-200 text-red-primary rounded-full text-sm font-medium hover:bg-red-50 transition-colors"
+                    >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Open Page
+                    </Link>
+                )}
+            </div>
+
+            <p className="text-xs text-gray-400 max-w-xs text-center">
+                {mode === 'link'
+                    ? "Scans directly to your Love Page with music & photos."
+                    : "Scans as plain text. The user will see your message immediately."}
+            </p>
+        </div>
+    );
+}
