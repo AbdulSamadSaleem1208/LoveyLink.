@@ -36,14 +36,43 @@ export default function QRDisplay({ url, title, message }: { url: string, title:
             if (navigator.share) {
                 await navigator.share(shareData);
                 toast.success("Shared successfully!");
-            } else {
+            } else if (navigator.clipboard && navigator.clipboard.writeText) {
                 await navigator.clipboard.writeText(data);
                 toast.success(mode === 'link' ? "Link copied to clipboard!" : "Message copied to clipboard!");
+            } else {
+                throw new Error("Clipboard API not available");
             }
         } catch (err) {
-            console.error("Error sharing:", err);
-            // Fallback if share fails (e.g. user cancelled)
-            // toast.error("Failed to share"); // Optional, maybe too noisy if user just cancelled
+            console.error("Error sharing/copying:", err);
+            // Fallback using execCommand
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = data;
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        toast.success(mode === 'link' ? "Link copied to clipboard!" : "Message copied to clipboard!");
+                    } else {
+                        toast.error("Failed to copy to clipboard");
+                    }
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                    toast.error("Failed to copy to clipboard");
+                }
+                document.body.removeChild(textArea);
+            } catch (fallbackError) {
+                console.error("Fallback clipboard failed:", fallbackError);
+                toast.error("Could not share or copy link");
+            }
         }
     };
 

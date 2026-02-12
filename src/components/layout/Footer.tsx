@@ -8,7 +8,7 @@ export default function Footer() {
                 <div className="flex flex-col md:flex-row justify-between items-center">
                     <div className="flex items-center gap-2 mb-4 md:mb-0 group">
                         <Heart className="h-6 w-6 text-red-primary fill-current drop-shadow-[0_0_5px_rgba(255,0,51,0.5)] group-hover:scale-110 transition-transform" />
-                        <span className="font-bold text-xl text-white group-hover:text-red-primary transition-colors">Heartzzu.</span>
+                        <span className="font-bold text-xl text-white group-hover:text-red-primary transition-colors">LoveyLink.</span>
                     </div>
 
                     <div className="flex space-x-8">
@@ -24,7 +24,7 @@ export default function Footer() {
                     </div>
                 </div>
                 <div className="mt-8 border-t border-white/10 pt-8 text-center text-sm text-gray-500">
-                    &copy; {new Date().getFullYear()} Heartzzu. All rights reserved.
+                    &copy; {new Date().getFullYear()} LoveyLink. All rights reserved.
                 </div>
             </div>
         </footer>

@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseAdminClient } from "@supabase/supabase-js";
 import Link from "next/link";
-import { Plus, Heart, Sparkles, MoreVertical, Trash2, Eye, QrCode as QrIcon } from "lucide-react";
+import { Plus, Heart, Sparkles, MoreVertical, Trash2, Eye, QrCode as QrIcon, LayoutDashboard } from "lucide-react";
 import { redirect } from "next/navigation";
+import WelcomeConfetti from "@/components/dashboard/WelcomeConfetti";
+import RefreshSubscriptionButton from "@/components/dashboard/RefreshSubscriptionButton";
 
 export default async function Dashboard() {
     const supabase = await createClient();
@@ -11,18 +14,92 @@ export default async function Dashboard() {
         redirect("/login");
     }
 
+    // Initialize Admin Client for robust data fetching (bypass RLS)
+    const supabaseAdmin = createSupabaseAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        }
+    );
+
     const { data: lovePages } = await supabase
         .from('love_pages')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-    // Check subscription status
-    const { data: userRef } = await supabase.from('users').select('subscription_status').eq('id', user.id).single();
-    const isPremium = userRef?.subscription_status === 'active';
+    // Check subscription status from SUBSCRIPTIONS table (Source of Truth)
+    // We bypass public.users because of schema cache issues on update
+    console.log(`[Dashboard] Checking subscription for user ${user.id}`);
+
+    // We can't import logDebug easily here if it's not a server component compatible export or path alias issue.
+    // Instead, let's just use console.log and trust the user will run it.
+    // Actually, I can import logs from actions.ts carefully or just copy the logging logic.
+    // Let's copy the logging logic to be safe and immediate.
+
+    const fs = require('fs');
+    const path = require('path');
+    const logPath = path.resolve('debug_dashboard.txt');
+    try {
+        fs.appendFileSync(logPath, `[${new Date().toISOString()}] Dashboard User: ${user.id}\n`);
+    } catch (e) { }
+
+    const { data: sub, error: subError } = await supabaseAdmin
+        .from('subscriptions')
+        .select('status, id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+    try {
+        fs.appendFileSync(logPath, `[${new Date().toISOString()}] Sub result: ${JSON.stringify(sub)} Error: ${JSON.stringify(subError)}\n`);
+    } catch (e) { }
+
+    let isPremium = !!sub;
+
+    if (!isPremium) {
+        // Fallback: Check payment_requests directly
+        const { data: payment } = await supabaseAdmin
+            .from('payment_requests')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('status', 'approved')
+            .limit(1)
+            .maybeSingle();
+
+        if (payment) {
+            console.log(`[Dashboard] Fallback Premium Granted via payment_requests for ${user.id}`);
+            isPremium = true;
+        }
+    }
+
+    // Check admin role
+    const { data: adminRole } = await supabase
+        .from('admin_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+    // Check for welcome flag in metadata
+    const showWelcome = user.user_metadata?.show_premium_welcome;
+
+    if (showWelcome) {
+        // Clear the flag immediately so it doesn't show again
+        await supabase.auth.updateUser({
+            data: { show_premium_welcome: null }
+        });
+    }
+
+    const isAdmin = !!adminRole || user.email === 'moizkiani@loveylink.com';
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 md:p-10">
+        <div className="min-h-screen bg-black text-white p-6 md:p-10 relative">
+            {showWelcome && <WelcomeConfetti />}
+
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
                     <div>
@@ -30,13 +107,34 @@ export default async function Dashboard() {
                         <p className="text-gray-400">Manage and create your special declarations.</p>
                     </div>
                     <div className="flex gap-4">
-                        <Link
-                            href="/pricing"
-                            className="flex items-center px-4 py-2 bg-background-card border border-white/10 text-white rounded-xl hover:bg-white/5 transition-colors"
-                        >
-                            {isPremium ? <Sparkles className="w-4 h-4 mr-2 text-yellow-400" /> : <Sparkles className="w-4 h-4 mr-2 text-gray-400" />}
-                            {isPremium ? "Premium Active" : "Upgrade to Premium"}
-                        </Link>
+                        {/* Admin Dashboard Button */}
+                        {isAdmin && (
+                            <Link
+                                href="/admin"
+                                className="flex items-center px-4 py-2 bg-red-600/20 text-red-500 border border-red-600/30 rounded-xl hover:bg-red-600/30 transition-colors"
+                            >
+                                <LayoutDashboard className="w-4 h-4 mr-2" />
+                                Admin Panel
+                            </Link>
+                        )}
+
+                        {isPremium ? (
+                            <div className="flex items-center px-4 py-2 bg-white/5 border border-white/10 text-white rounded-xl">
+                                <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-600 font-bold">Premium Active</span>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <RefreshSubscriptionButton />
+                                <Link
+                                    href="/pricing"
+                                    className="flex items-center px-4 py-2 bg-background-card border border-white/10 text-white rounded-xl hover:bg-white/5 transition-colors"
+                                >
+                                    <Sparkles className="w-4 h-4 mr-2 text-gray-400" />
+                                    Upgrade to Premium
+                                </Link>
+                            </div>
+                        )}
                         <Link
                             href="/create"
                             className="flex items-center px-6 py-2 bg-button-gradient text-white rounded-xl shadow-lg shadow-red-900/40 hover:opacity-90 transition-all transform hover:scale-105"

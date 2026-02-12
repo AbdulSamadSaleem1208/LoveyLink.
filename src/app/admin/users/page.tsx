@@ -1,9 +1,21 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
+import { BackButton } from "@/components/ui/back-button";
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminUsersPage() {
-    const supabase = await createClient();
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        }
+    );
 
-    const { data: users } = await supabase
+    const { data: users } = await supabaseAdmin
         .from('users')
         .select('*')
         .order('created_at', { ascending: false })
@@ -11,7 +23,10 @@ export default async function AdminUsersPage() {
 
     return (
         <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-8">User Management</h1>
+            <div className="mb-8 flex items-center gap-4">
+                <BackButton className="text-gray-500 hover:text-gray-900" />
+                <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+            </div>
 
             <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">

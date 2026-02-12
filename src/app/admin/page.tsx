@@ -1,8 +1,19 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { Users, CreditCard, Heart, QrCode } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboard() {
-    const supabase = await createClient();
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        }
+    );
 
     // Parallel fetching for stats
     const [
@@ -11,10 +22,10 @@ export default async function AdminDashboard() {
         { count: subCount },
         { count: qrScanCount }
     ] = await Promise.all([
-        supabase.from('users').select('*', { count: 'exact', head: true }),
-        supabase.from('love_pages').select('*', { count: 'exact', head: true }),
-        supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-        supabase.from('qr_scans').select('*', { count: 'exact', head: true })
+        supabaseAdmin.from('users').select('*', { count: 'exact', head: true }),
+        supabaseAdmin.from('love_pages').select('*', { count: 'exact', head: true }),
+        supabaseAdmin.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+        supabaseAdmin.from('qr_scans').select('*', { count: 'exact', head: true })
     ]);
 
     return (

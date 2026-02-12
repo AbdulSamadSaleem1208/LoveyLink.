@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Users, LayoutDashboard, LogOut } from "lucide-react";
+import AdminSignOutButton from "@/components/admin/AdminSignOutButton";
 
 export default async function AdminLayout({
     children,
@@ -22,7 +23,10 @@ export default async function AdminLayout({
         .eq('user_id', user.id)
         .single();
 
-    if (!adminRole) {
+    // Hardcoded bypass for the owner
+    const isOwner = user.email === 'moizkiani@loveylink.com';
+
+    if (!adminRole && !isOwner) {
         redirect("/dashboard"); // Not an admin
     }
 
@@ -47,11 +51,12 @@ export default async function AdminLayout({
                         Payments
                     </Link>
                 </nav>
-                <div className="absolute bottom-0 w-64 p-4 border-t border-gray-800">
-                    <Link href="/dashboard" className="flex items-center px-4 py-3 text-gray-400 hover:text-white transition-colors">
-                        <LogOut className="w-5 h-5 mr-3" />
+                <div className="absolute bottom-0 w-64 p-4 border-t border-gray-800 space-y-2">
+                    <Link href="/dashboard" className="flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
+                        <LayoutDashboard className="w-5 h-5 mr-3" />
                         Exit to App
                     </Link>
+                    <AdminSignOutButton />
                 </div>
             </aside>
 

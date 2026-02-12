@@ -11,7 +11,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Love Link - Create Your Romantic Love Page",
+  title: "LoveyLink - Create Your Romantic Love Page",
   description: "Share your love story with a beautiful, custom web page. Include photos, music, and your unique journey.",
 };
 

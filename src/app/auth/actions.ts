@@ -88,3 +88,33 @@ export async function signout() {
     revalidatePath("/", "layout");
     redirect("/login");
 }
+
+export async function forgotPassword(data: { email: string }) {
+    const supabase = await createClient();
+    const origin = (await headers()).get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+    const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${origin}/auth/callback?next=/update-password`,
+    });
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    return { success: true };
+}
+
+export async function updatePassword(password: string) {
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.updateUser({
+        password: password
+    });
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    revalidatePath("/", "layout");
+    redirect("/dashboard");
+}

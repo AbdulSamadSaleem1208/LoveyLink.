@@ -35,7 +35,7 @@ function FAQItem({ question, answer }: { question: string, answer: string }) {
 export default function FAQPage() {
     const faqs = [
         {
-            question: "How does Heartzzu work?",
+            question: "How does LoveyLink work?",
             answer: "It's simple! You choose a template, customize it with your own photos, messages, and music, and we generate a unique web page for you. You can then share this page with your loved one via a direct link or a custom QR code."
         },
         {

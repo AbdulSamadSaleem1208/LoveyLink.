@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Check, X, Loader2, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { approvePayment, rejectPayment } from "./actions";
+import { approvePayment, rejectPayment, getPaymentRequests } from "./actions";
+import { BackButton } from "@/components/ui/back-button";
 
 interface PaymentRequest {
     id: string;
@@ -30,23 +31,13 @@ export default function AdminPaymentsPage() {
     }, []);
 
     const fetchPayments = async () => {
-        const supabase = createClient();
-        const { data, error } = await supabase
-            .from('payment_requests')
-            .select(`
-                *,
-                users (
-                    email,
-                    full_name
-                )
-            `)
-            .order('created_at', { ascending: false });
+        const result = await getPaymentRequests();
 
-        if (error) {
-            console.error(error);
+        if (result.error) {
+            console.error(result.error);
             toast.error("Failed to fetch payments");
         } else {
-            setPayments((data as any) || []);
+            setPayments((result.data as any) || []);
         }
         setLoading(false);
     };
@@ -82,7 +73,10 @@ export default function AdminPaymentsPage() {
 
     return (
         <div className="p-6">
-            <h1 className="text-2xl font-bold text-white mb-6">Payment Approvals (Easypaisa)</h1>
+            <div className="mb-6 flex items-center gap-4">
+                <BackButton className="text-gray-400 hover:text-white" />
+                <h1 className="text-2xl font-bold text-white">Payment Approvals (Easypaisa)</h1>
+            </div>
 
             <div className="bg-background-card rounded-xl border border-white/10 overflow-hidden">
                 <table className="w-full text-left">

@@ -140,6 +140,16 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-8 bg-black text-center text-gray-600 text-sm border-t border-white/10">
+        <p>© {new Date().getFullYear()} LoveyLink. All rights reserved.</p>
+        <div className="mt-4">
+          <Link href="/login" className="text-gray-700 hover:text-gray-500 transition-colors text-xs">
+            Admin Login
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }

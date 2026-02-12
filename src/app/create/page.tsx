@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { checkSubscriptionStatus } from "@/app/actions";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AnimatePresence, motion } from "framer-motion";
@@ -107,6 +108,18 @@ export default function CreateLovePage() {
                 router.push("/login");
                 return;
             }
+
+            // Check Subscription Status (Server-Side)
+            const { isPremium } = await checkSubscriptionStatus();
+
+            if (!isPremium) {
+                toast.error("Upgrade to Premium to publish & unlock QR code");
+                // Optional: redirect to pricing after a short delay
+                setTimeout(() => router.push("/pricing"), 1500);
+                return;
+            }
+
+
 
             // Create unique slug
             const slug = `${formData.recipient_name}-${Math.random().toString(36).substring(2, 7)}`.toLowerCase().replace(/\s+/g, '-');

@@ -53,7 +53,7 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <Link href="/" className="flex-shrink-0 flex items-center gap-2 group">
                             <Heart className="h-8 w-8 text-red-primary fill-current drop-shadow-[0_0_8px_rgba(255,0,51,0.5)] group-hover:scale-110 transition-transform" />
-                            <span className="font-bold text-2xl text-white tracking-tight group-hover:text-red-primary transition-colors">Heartzzu.</span>
+                            <span className="font-bold text-2xl text-white tracking-tight group-hover:text-red-primary transition-colors">LoveyLink.</span>
                         </Link>
                     </div>
 
@@ -81,7 +81,7 @@ export default function Navbar() {
                                 </Link>
                                 <button
                                     onClick={handleSignOut}
-                                    className="text-gray-400 hover:text-red-primary transition-colors text-sm"
+                                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-white/10"
                                 >
                                     Sign Out
                                 </button>

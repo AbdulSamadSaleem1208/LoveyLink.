@@ -1,0 +1,63 @@
+[2026-02-11T15:23:47.943Z] Starting refreshSubscription...
+[2026-02-11T15:23:48.880Z] refreshSubscription for user: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-11T15:23:49.280Z] Found approved payment: 895d2291-7d34-4b47-bdab-e14583a12f11
+[2026-02-11T15:23:49.855Z] Subscription insert failed: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-11T15:23:50.202Z] Error checking public user: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T15:23:50.719Z] WARNING: Failed to refresh public.users status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T15:24:01.051Z] [CheckSubscription] User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T15:24:01.054Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T15:33:31.587Z] Starting refreshSubscription...
+[2026-02-11T15:33:31.989Z] refreshSubscription for user: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-11T15:33:32.333Z] Found approved payment: 895d2291-7d34-4b47-bdab-e14583a12f11
+[2026-02-11T15:33:32.876Z] Subscription insert failed: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-11T15:33:33.208Z] Error checking public user: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T15:33:33.510Z] WARNING: Failed to refresh public.users status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T15:50:06.660Z] [CheckSubscription] User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T15:50:06.662Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T15:58:11.871Z] [CheckSubscription] User: e827d435-e743-4227-b174-f1e4ab8ead78, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T15:58:11.874Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T16:22:01.243Z] [CheckSubscription] User: e827d435-e743-4227-b174-f1e4ab8ead78, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T16:22:01.244Z] [CheckSubscription] Attempting Tertiary Fallback for e827d435-e743-4227-b174-f1e4ab8ead78...
+[2026-02-11T16:22:01.626Z] [CheckSubscription] Found approved payment request for e827d435-e743-4227-b174-f1e4ab8ead78. Fallback Premium Granted.
+[2026-02-11T16:22:40.464Z] [CheckSubscription] User: dbfbe511-5ee5-40d1-8ea1-18bc34ad0748, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T16:22:40.465Z] [CheckSubscription] Attempting Tertiary Fallback for dbfbe511-5ee5-40d1-8ea1-18bc34ad0748...
+[2026-02-11T16:22:41.099Z] [CheckSubscription] No approved payment found for dbfbe511-5ee5-40d1-8ea1-18bc34ad0748 in fallback.
+[2026-02-11T16:22:41.099Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T16:24:22.547Z] [CheckSubscription] User: dbfbe511-5ee5-40d1-8ea1-18bc34ad0748, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T16:24:22.549Z] [CheckSubscription] Attempting Tertiary Fallback for dbfbe511-5ee5-40d1-8ea1-18bc34ad0748...
+[2026-02-11T16:24:22.953Z] [CheckSubscription] Found approved payment request for dbfbe511-5ee5-40d1-8ea1-18bc34ad0748. Fallback Premium Granted.
+[2026-02-11T16:52:52.572Z] [CheckSubscription] User: a44a2d73-3925-4036-81ca-835a006f6843, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T16:52:52.572Z] [CheckSubscription] Attempting Tertiary Fallback for a44a2d73-3925-4036-81ca-835a006f6843...
+[2026-02-11T16:52:52.862Z] [CheckSubscription] No approved payment found for a44a2d73-3925-4036-81ca-835a006f6843 in fallback.
+[2026-02-11T16:52:52.862Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T16:54:26.049Z] [CheckSubscription] User: a44a2d73-3925-4036-81ca-835a006f6843, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T16:54:26.050Z] [CheckSubscription] Attempting Tertiary Fallback for a44a2d73-3925-4036-81ca-835a006f6843...
+[2026-02-11T16:54:26.376Z] [CheckSubscription] Found approved payment request for a44a2d73-3925-4036-81ca-835a006f6843. Fallback Premium Granted.
+[2026-02-11T17:15:17.967Z] [CheckSubscription] User: 77cbbb04-d8c6-4b50-a11c-a718a3f59604, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T17:15:17.967Z] [CheckSubscription] Attempting Tertiary Fallback for 77cbbb04-d8c6-4b50-a11c-a718a3f59604...
+[2026-02-11T17:15:18.324Z] [CheckSubscription] No approved payment found for 77cbbb04-d8c6-4b50-a11c-a718a3f59604 in fallback.
+[2026-02-11T17:15:18.325Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-11T17:16:31.152Z] [CheckSubscription] User: 77cbbb04-d8c6-4b50-a11c-a718a3f59604, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T17:16:31.153Z] [CheckSubscription] Attempting Tertiary Fallback for 77cbbb04-d8c6-4b50-a11c-a718a3f59604...
+[2026-02-11T17:16:31.521Z] [CheckSubscription] Found approved payment request for 77cbbb04-d8c6-4b50-a11c-a718a3f59604. Fallback Premium Granted.
+[2026-02-11T17:17:26.384Z] [CheckSubscription] User: 77cbbb04-d8c6-4b50-a11c-a718a3f59604, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-11T17:17:26.385Z] [CheckSubscription] Attempting Tertiary Fallback for 77cbbb04-d8c6-4b50-a11c-a718a3f59604...
+[2026-02-11T17:17:26.672Z] [CheckSubscription] Found approved payment request for 77cbbb04-d8c6-4b50-a11c-a718a3f59604. Fallback Premium Granted.
+[2026-02-12T15:52:28.553Z] [CheckSubscription] User: 8fd0f2bb-c96c-4855-89e4-61da2f06f2bb, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-12T15:52:28.554Z] [CheckSubscription] Attempting Tertiary Fallback for 8fd0f2bb-c96c-4855-89e4-61da2f06f2bb...
+[2026-02-12T15:52:28.822Z] [CheckSubscription] No approved payment found for 8fd0f2bb-c96c-4855-89e4-61da2f06f2bb in fallback.
+[2026-02-12T15:52:28.823Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-12T15:54:28.493Z] [CheckSubscription] User: 8fd0f2bb-c96c-4855-89e4-61da2f06f2bb, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-12T15:54:28.495Z] [CheckSubscription] Attempting Tertiary Fallback for 8fd0f2bb-c96c-4855-89e4-61da2f06f2bb...
+[2026-02-12T15:54:28.899Z] [CheckSubscription] Found approved payment request for 8fd0f2bb-c96c-4855-89e4-61da2f06f2bb. Fallback Premium Granted.
+[2026-02-12T15:55:28.668Z] [CheckSubscription] User: b8a959ea-ca22-4b91-a055-926ef9f6ac00, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-12T15:55:28.670Z] [CheckSubscription] Attempting Tertiary Fallback for b8a959ea-ca22-4b91-a055-926ef9f6ac00...
+[2026-02-12T15:55:28.969Z] [CheckSubscription] No approved payment found for b8a959ea-ca22-4b91-a055-926ef9f6ac00 in fallback.
+[2026-02-12T15:55:28.971Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-12T15:56:38.363Z] [CheckSubscription] User: b8a959ea-ca22-4b91-a055-926ef9f6ac00, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-12T15:56:38.368Z] [CheckSubscription] Attempting Tertiary Fallback for b8a959ea-ca22-4b91-a055-926ef9f6ac00...
+[2026-02-12T15:56:38.655Z] [CheckSubscription] Found approved payment request for b8a959ea-ca22-4b91-a055-926ef9f6ac00. Fallback Premium Granted.
+[2026-02-12T17:52:07.209Z] [CheckSubscription] User: ce0e2b72-be1b-4c68-910f-2b47619da983, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-12T17:52:07.211Z] [CheckSubscription] Attempting Tertiary Fallback for ce0e2b72-be1b-4c68-910f-2b47619da983...
+[2026-02-12T17:52:07.530Z] [CheckSubscription] No approved payment found for ce0e2b72-be1b-4c68-910f-2b47619da983 in fallback.
+[2026-02-12T17:52:07.531Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
