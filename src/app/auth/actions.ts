@@ -112,18 +112,29 @@ export async function signout() {
 }
 
 export async function forgotPassword(data: { email: string }) {
-    const supabase = await createClient();
-    const origin = await getSiteUrl();
+    try {
+        const supabase = await createClient();
+        const origin = await getSiteUrl();
+        const redirectUrl = `${origin}/auth/callback?next=${encodeURIComponent('/update-password')}`;
 
-    const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${origin}/auth/callback?next=${encodeURIComponent('/update-password')}`,
-    });
+        console.log("Forgot Password Request:", data.email);
+        console.log("Resolved Origin:", origin);
+        console.log("Redirect URL:", redirectUrl);
 
-    if (error) {
-        return { error: error.message };
+        const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+            redirectTo: redirectUrl,
+        });
+
+        if (error) {
+            console.error("Supabase Reset Error:", error);
+            return { error: error.message };
+        }
+
+        return { success: true };
+    } catch (err) {
+        console.error("Unexpected Error in forgotPassword:", err);
+        return { error: "Unexpected server error. Check logs." };
     }
-
-    return { success: true };
 }
 
 export async function updatePassword(password: string) {

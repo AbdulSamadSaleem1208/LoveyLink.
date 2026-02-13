@@ -10,19 +10,25 @@ export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [errorMsg, setErrorMsg] = useState("");
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setErrorMsg("");
 
         try {
             const result = await forgotPassword({ email });
             if (result?.error) {
                 toast.error(result.error);
+                setErrorMsg(result.error);
             } else {
                 toast.success("Password reset link sent to your email!");
             }
         } catch (error) {
+            console.error("Client Submit Error:", error);
             toast.error("Something went wrong. Please try again.");
+            setErrorMsg("Network or client error occurring.");
         } finally {
             setLoading(false);
         }
@@ -38,6 +44,11 @@ export default function ForgotPasswordPage() {
                     <p className="mt-2 text-center text-sm text-gray-600">
                         Enter your email address and we'll send you a link to reset your password.
                     </p>
+                    {errorMsg && (
+                        <div className="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-200 text-center">
+                            {errorMsg}
+                        </div>
+                    )}
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div>
