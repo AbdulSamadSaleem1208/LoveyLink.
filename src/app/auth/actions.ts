@@ -116,7 +116,7 @@ export async function forgotPassword(data: { email: string }) {
     const origin = await getSiteUrl();
 
     const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${origin}/auth/callback?next=/update-password`,
+        redirectTo: `${origin}/auth/callback?next=${encodeURIComponent('/update-password')}`,
     });
 
     if (error) {

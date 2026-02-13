@@ -5,12 +5,12 @@ import { redirect } from 'next/navigation'
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
     const code = searchParams.get('code')
-
-    console.log("Auth Callback Triggered. URL:", request.url);
-    console.log("Code present:", !!code);
-
-    // if "next" is in param, use it as the redirect URL
     const next = searchParams.get('next') ?? '/dashboard'
+
+    console.log("Auth Callback Triggered.");
+    console.log("  URL:", request.url);
+    console.log("  Next Param:", next);
+    console.log("  Code Present:", !!code);
 
     if (code) {
         const supabase = await createClient()
