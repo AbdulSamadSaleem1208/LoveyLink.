@@ -1,38 +1,28 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(req: NextRequest) {
-    // Create a response object that we can pass to the client
-    const res = NextResponse.next()
+export function middleware(request: NextRequest) {
+    // 1. Define the protected paths
+    const publicPaths = ['/about', '/features', '/contact', '/privacy', '/terms', '/login', '/auth', '/register', '/public'];
+    const isPublic = publicPaths.some(path => request.nextUrl.pathname.startsWith(path)) || request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/lp/');
 
-    // Create the Supabase client
-    const supabase = createMiddlewareClient({ req, res })
+    // 2. Check for Supabase session cookie
+    // The cookie name pattern is usually `sb-<project-ref>-auth-token`
+    // We check for *any* cookie starting with `sb-` and ending with `-auth-token` OR standard `sb-access-token`
+    const hasSession = request.cookies.getAll().some(cookie =>
+        (cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token')) ||
+        cookie.name === 'sb-access-token'
+    );
 
-    // Refresh session if needed
-    const {
-        data: { session },
-    } = await supabase.auth.getSession()
-
-    // Auth Protection Logic
-    if (
-        !session &&
-        !req.nextUrl.pathname.startsWith('/login') &&
-        !req.nextUrl.pathname.startsWith('/auth') &&
-        !req.nextUrl.pathname.startsWith('/register') &&
-        !req.nextUrl.pathname.startsWith('/public') &&
-        req.nextUrl.pathname !== '/'
-    ) {
-        // no user, potentially redirect to login
-        // BUT we have public pages like /features, /about, /contact
-        const publicPaths = ['/about', '/features', '/contact', '/privacy', '/terms'];
-        if (!publicPaths.includes(req.nextUrl.pathname) && !req.nextUrl.pathname.startsWith('/lp/')) {
-            const url = req.nextUrl.clone()
-            url.pathname = '/login'
-            return NextResponse.redirect(url)
-        }
+    // 3. Auth Protection Logic
+    if (!hasSession && !isPublic) {
+        // No session cookie found on a protected route
+        const url = request.nextUrl.clone()
+        url.pathname = '/login'
+        return NextResponse.redirect(url)
     }
 
-    return res
+    // 4. Continue
+    return NextResponse.next()
 }
 
 export const config = {
