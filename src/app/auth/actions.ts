@@ -138,5 +138,5 @@ export async function updatePassword(password: string) {
     }
 
     revalidatePath("/", "layout");
-    redirect("/dashboard");
+    return { success: true };
 }
