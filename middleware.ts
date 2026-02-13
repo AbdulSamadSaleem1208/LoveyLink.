@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
+console.log('DEBUG: Middleware loaded');
+
 export function middleware(request: NextRequest) {
+    console.log('DEBUG: Middleware request:', request.nextUrl.pathname);
     // 1. Define the protected paths
     const publicPaths = ['/about', '/features', '/contact', '/privacy', '/terms', '/login', '/auth', '/register', '/public'];
     const isPublic = publicPaths.some(path => request.nextUrl.pathname.startsWith(path)) || request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/lp/');
