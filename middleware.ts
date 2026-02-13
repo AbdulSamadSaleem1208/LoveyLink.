@@ -9,7 +9,6 @@ export async function middleware(request: NextRequest) {
 
         if (!supabaseUrl || !supabaseKey) {
             console.error('Middleware Error: Missing Supabase Environment Variables');
-            // Allow request to proceed (or fail gracefully) rather than crashing middleware
             return NextResponse.next();
         }
 
@@ -17,28 +16,34 @@ export async function middleware(request: NextRequest) {
             request,
         })
 
-        const supabase = createServerClient(
-            supabaseUrl,
-            supabaseKey,
-            {
-                cookies: {
-                    getAll() {
-                        return request.cookies.getAll()
+        let supabase;
+        try {
+            supabase = createServerClient(
+                supabaseUrl,
+                supabaseKey,
+                {
+                    cookies: {
+                        getAll() {
+                            return request.cookies.getAll()
+                        },
+                        setAll(cookiesToSet) {
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                request.cookies.set(name, value)
+                            )
+                            supabaseResponse = NextResponse.next({
+                                request,
+                            })
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                supabaseResponse.cookies.set(name, value, options)
+                            )
+                        },
                     },
-                    setAll(cookiesToSet) {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            request.cookies.set(name, value)
-                        )
-                        supabaseResponse = NextResponse.next({
-                            request,
-                        })
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            supabaseResponse.cookies.set(name, value, options)
-                        )
-                    },
-                },
-            }
-        )
+                }
+            )
+        } catch (err) {
+            console.error('Middleware Error: Failed to create Supabase client:', err);
+            return NextResponse.next();
+        }
 
         // Do not run on static files
         if (request.nextUrl.pathname.startsWith('/_next') ||
@@ -46,31 +51,43 @@ export async function middleware(request: NextRequest) {
             return supabaseResponse;
         }
 
-        const {
-            data: { user },
-        } = await supabase.auth.getUser()
+        try {
+            const {
+                data: { user },
+                error: userError
+            } = await supabase.auth.getUser()
 
-        if (
-            !user &&
-            !request.nextUrl.pathname.startsWith('/login') &&
-            !request.nextUrl.pathname.startsWith('/auth') &&
-            !request.nextUrl.pathname.startsWith('/register') &&
-            !request.nextUrl.pathname.startsWith('/public') &&
-            request.nextUrl.pathname !== '/'
-        ) {
-            // no user, potentially redirect to login
-            // BUT we have public pages like /features, /about, /contact
-            const publicPaths = ['/about', '/features', '/contact', '/privacy', '/terms'];
-            if (!publicPaths.includes(request.nextUrl.pathname) && !request.nextUrl.pathname.startsWith('/lp/')) {
-                const url = request.nextUrl.clone()
-                url.pathname = '/login'
-                return NextResponse.redirect(url)
+            if (userError) {
+                // Log but don't crash, might be just no session
+                // console.warn('Middleware Auth Check: No active session or error:', userError.message);
             }
+
+            if (
+                !user &&
+                !request.nextUrl.pathname.startsWith('/login') &&
+                !request.nextUrl.pathname.startsWith('/auth') &&
+                !request.nextUrl.pathname.startsWith('/register') &&
+                !request.nextUrl.pathname.startsWith('/public') &&
+                request.nextUrl.pathname !== '/'
+            ) {
+                // no user, potentially redirect to login
+                // BUT we have public pages like /features, /about, /contact
+                const publicPaths = ['/about', '/features', '/contact', '/privacy', '/terms'];
+                if (!publicPaths.includes(request.nextUrl.pathname) && !request.nextUrl.pathname.startsWith('/lp/')) {
+                    const url = request.nextUrl.clone()
+                    url.pathname = '/login'
+                    return NextResponse.redirect(url)
+                }
+            }
+        } catch (authErr) {
+            console.error('Middleware Error: Auth check failed:', authErr);
+            // Allow request to proceed if auth check fails abruptly
+            return supabaseResponse;
         }
 
         return supabaseResponse
     } catch (e) {
-        console.error('Middleware execution failed:', e);
+        console.error('CRITICAL Middleware execution failed:', e);
         // Fallback: Allow request to continue if middleware fails
         return NextResponse.next({
             request: {
