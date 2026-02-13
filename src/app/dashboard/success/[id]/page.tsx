@@ -25,20 +25,34 @@ export default async function SuccessPage({ params }: Props) {
 
     if (!page) notFound();
 
-    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    // Determine the base URL
+    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
-    // If running locally, try to replace localhost with LAN IP for mobile scanning
+    if (!siteUrl) {
+        if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+            siteUrl = `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+        } else if (process.env.VERCEL_URL) {
+            siteUrl = `https://${process.env.VERCEL_URL}`;
+        } else {
+            siteUrl = "http://localhost:3000";
+        }
+    }
+
+    // If strictly localhost (dev mode), try to use LAN IP for mobile testing
     if (siteUrl.includes("localhost")) {
-        const { networkInterfaces } = require('os');
-        const nets = networkInterfaces();
-        for (const name of Object.keys(nets)) {
-            for (const net of nets[name]) {
-                // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-                if (net.family === 'IPv4' && !net.internal) {
-                    siteUrl = siteUrl.replace("localhost", net.address);
-                    break;
+        try {
+            const { networkInterfaces } = require('os');
+            const nets = networkInterfaces();
+            for (const name of Object.keys(nets)) {
+                for (const net of nets[name]) {
+                    if (net.family === 'IPv4' && !net.internal) {
+                        siteUrl = siteUrl.replace("localhost", net.address);
+                        break;
+                    }
                 }
             }
+        } catch (e) {
+            console.warn("Could not resolve LAN IP:", e);
         }
     }
 

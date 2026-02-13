@@ -6,6 +6,28 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { headers } from "next/headers";
 
+// Helper to get the absolute site URL
+const getSiteUrl = async () => {
+    let url = process.env.NEXT_PUBLIC_SITE_URL;
+
+    if (!url) {
+        if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+            url = `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+        } else if (process.env.VERCEL_URL) {
+            url = `https://${process.env.VERCEL_URL}`;
+        }
+    }
+
+    if (!url) {
+        const reqHeaders = await headers();
+        const origin = reqHeaders.get("origin");
+        if (origin) return origin;
+        url = "http://localhost:3000";
+    }
+
+    return url;
+};
+
 export async function login(formData: FormData) {
     const supabase = await createClient();
 
@@ -27,7 +49,7 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
     const supabase = await createClient();
 
-    const origin = (await headers()).get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const origin = await getSiteUrl();
 
     console.log("Signup triggered. Redirect URL:", `${origin}/auth/callback`);
 
@@ -63,7 +85,7 @@ export async function signup(formData: FormData) {
 export async function resendVerificationEmail(email: string) {
     console.log("Resend Verification Email Triggered for:", email);
     const supabase = await createClient();
-    const origin = (await headers()).get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const origin = await getSiteUrl();
 
     const { error } = await supabase.auth.resend({
         type: 'signup',
@@ -91,7 +113,7 @@ export async function signout() {
 
 export async function forgotPassword(data: { email: string }) {
     const supabase = await createClient();
-    const origin = (await headers()).get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const origin = await getSiteUrl();
 
     const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
         redirectTo: `${origin}/auth/callback?next=/update-password`,
