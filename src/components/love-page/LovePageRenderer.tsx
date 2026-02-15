@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, Music } from "lucide-react";
+import { Heart } from "lucide-react";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
-import SafeReactPlayer from "./SafeReactPlayer";
+import SpotifyEmbed from "./SpotifyEmbed";
 
 // Types matching DB schema approximately
 export interface LovePageData {
@@ -23,71 +23,16 @@ export interface LovePageData {
 }
 
 export default function LovePageRenderer({ data, preview = false }: { data: LovePageData; preview?: boolean }) {
-    // Auto-start music if available, unless in preview mode
-    const [isPlaying, setIsPlaying] = useState(!preview && !!data.music_url);
     const [hasMounted, setHasMounted] = useState(false);
-    const [showPlayPrompt, setShowPlayPrompt] = useState(false);
 
     useEffect(() => {
-        console.log("[LovePageRenderer] Component mounted");
         setHasMounted(true);
     }, []);
-
-    // Auto-play music when page loads (if not preview)
-    useEffect(() => {
-        if (data.music_url && hasMounted && !preview) {
-            console.log("[LovePageRenderer] Auto-play triggered. URL:", data.music_url);
-            // Start playing immediately
-            setIsPlaying(true);
-
-            // Show minimal prompt as backup (auto-hide if music starts)
-            const timer = setTimeout(() => {
-                console.log("[LovePageRenderer] Showing play prompt");
-                setShowPlayPrompt(true);
-            }, 800);
-
-            // Auto-hide prompt after 3 seconds
-            const hideTimer = setTimeout(() => {
-                console.log("[LovePageRenderer] Auto-hiding prompt");
-                setShowPlayPrompt(false);
-            }, 3800);
-
-            return () => {
-                clearTimeout(timer);
-                clearTimeout(hideTimer);
-            };
-        }
-    }, [data.music_url, hasMounted, preview]);
-
-    // Handle auto-play blocked callback
-    const handleAutoPlayBlocked = () => {
-        console.log("Auto-play blocked, keeping prompt visible");
-        setShowPlayPrompt(true);
-        // Keep isPlaying true - muted playback will work
-    };
-
-    // Handle successful play start
-    const handlePlayStart = () => {
-        console.log("Music started playing");
-        setShowPlayPrompt(false); // Hide prompt when music starts
-    };
-
-    const toggleMusic = () => {
-        setIsPlaying(!isPlaying);
-        setShowPlayPrompt(false); // Hide prompt when user interacts
-    };
-
-    // Force play when prompt is clicked
-    const handlePromptClick = () => {
-        console.log("Prompt clicked, forcing play");
-        setIsPlaying(true);
-        setShowPlayPrompt(false);
-    };
 
     const bgColor = data.theme_config?.backgroundColor || "#FFF1F2"; // Default blush
     const primaryColor = data.theme_config?.primaryColor || "#9B1C1C"; // Default red
 
-    if (!hasMounted) return null; // Prevent hydration mismatch for player
+    if (!hasMounted) return null; // Prevent hydration mismatch
 
     return (
         <div
@@ -101,46 +46,6 @@ export default function LovePageRenderer({ data, preview = false }: { data: Love
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 {/* Creating some floating hearts manually or via loop could go here */}
             </div>
-
-            {/* Music Player Control */}
-            {data.music_url && (
-                <div className="fixed top-4 right-4 z-50">
-                    <button
-                        onClick={toggleMusic}
-                        className="bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-lg border border-red-100 hover:scale-110 transition-transform relative"
-                        style={{ color: primaryColor }}
-                        aria-label={isPlaying ? "Pause music" : "Play music"}
-                    >
-                        <Music className={`h-6 w-6 ${isPlaying ? 'animate-pulse' : ''}`} />
-                        {!isPlaying && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-0 h-0 border-l-8 border-l-current border-y-6 border-y-transparent ml-1" />
-                            </div>
-                        )}
-                    </button>
-
-                    {/* Auto-play prompt */}
-                    {showPlayPrompt && (
-                        <div
-                            onClick={handlePromptClick}
-                            className="absolute top-16 right-0 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border border-red-100 cursor-pointer hover:bg-white transition-all animate-bounce"
-                            style={{ color: primaryColor }}
-                        >
-                            <p className="text-sm font-medium whitespace-nowrap">
-                                🎵 Tap to play music
-                            </p>
-                        </div>
-                    )}
-
-                    <SafeReactPlayer
-                        url={data.music_url}
-                        playing={isPlaying}
-                        onToggle={toggleMusic}
-                        onAutoPlayBlocked={handleAutoPlayBlocked}
-                        onPlayStart={handlePlayStart}
-                    />
-                </div>
-            )}
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -210,6 +115,19 @@ export default function LovePageRenderer({ data, preview = false }: { data: Love
                     </p>
                 </div>
             </motion.div>
+
+            {/* Spotify Music Player */}
+            {data.music_url && !preview && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-12 w-full max-w-md mx-auto z-10"
+                >
+                    <SpotifyEmbed url={data.music_url} />
+                </motion.div>
+            )}
 
             {/* Footer for the page */}
             <div className="mt-20 text-center text-gray-500 text-sm z-10 pb-10">

@@ -124,6 +124,15 @@ export default function CreateLovePage() {
             // Create unique slug
             const slug = `${formData.recipient_name}-${Math.random().toString(36).substring(2, 7)}`.toLowerCase().replace(/\s+/g, '-');
 
+            // Convert Spotify URL to embed format if needed
+            let musicUrl = formData.music_url;
+            if (musicUrl) {
+                const trackMatch = musicUrl.match(/track\/([a-zA-Z0-9]+)/);
+                if (trackMatch && !musicUrl.includes('/embed/')) {
+                    musicUrl = `https://open.spotify.com/embed/track/${trackMatch[1]}`;
+                }
+            }
+
             const payload = {
                 user_id: user.id,
                 slug: slug,
@@ -132,7 +141,7 @@ export default function CreateLovePage() {
                 sender_name: formData.sender_name,
                 message: formData.message,
                 images: formData.images,
-                music_url: formData.music_url,
+                music_url: musicUrl,
                 theme_config: {
                     primaryColor: formData.theme,
                     backgroundColor: "#000000",
@@ -327,7 +336,7 @@ export default function CreateLovePage() {
                                 </div>
 
                                 <div className="mt-8">
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Youtube Music URL (Optional)</label>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">Spotify Track URL (Optional)</label>
                                     <div className="relative">
                                         <Music className="absolute top-3 left-3 w-5 h-5 text-gray-500" />
                                         <input
@@ -335,9 +344,10 @@ export default function CreateLovePage() {
                                             value={formData.music_url}
                                             onChange={e => setFormData({ ...formData, music_url: e.target.value })}
                                             className="block w-full pl-10 pr-4 py-3 bg-background-card border border-white/10 rounded-xl text-white placeholder-gray-600 focus:ring-2 focus:ring-red-primary focus:border-transparent outline-none transition-all"
-                                            placeholder="https://youtube.com/watch?v=..."
+                                            placeholder="https://open.spotify.com/track/..."
                                         />
                                     </div>
+                                    <p className="text-xs text-gray-500 mt-1">Paste a Spotify track link to add background music</p>
                                 </div>
                             </motion.div>
                         )}
