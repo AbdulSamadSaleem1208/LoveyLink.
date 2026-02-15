@@ -35,24 +35,31 @@ export default function LovePageRenderer({ data, preview = false }: { data: Love
     // Auto-play music when page loads (if not preview)
     useEffect(() => {
         if (data.music_url && hasMounted && !preview) {
-            // Start playing
+            // Start playing immediately
             setIsPlaying(true);
 
-            // Show prompt immediately for mobile users
-            // They can click to start if auto-play is blocked
+            // Show minimal prompt as backup (auto-hide if music starts)
             const timer = setTimeout(() => {
                 setShowPlayPrompt(true);
-            }, 1000);
+            }, 800);
 
-            return () => clearTimeout(timer);
+            // Auto-hide prompt after 3 seconds
+            const hideTimer = setTimeout(() => {
+                setShowPlayPrompt(false);
+            }, 3800);
+
+            return () => {
+                clearTimeout(timer);
+                clearTimeout(hideTimer);
+            };
         }
     }, [data.music_url, hasMounted, preview]);
 
     // Handle auto-play blocked callback
     const handleAutoPlayBlocked = () => {
-        console.log("Auto-play blocked, showing prompt");
+        console.log("Auto-play blocked, keeping prompt visible");
         setShowPlayPrompt(true);
-        setIsPlaying(false); // Reset to stopped state
+        // Keep isPlaying true - muted playback will work
     };
 
     // Handle successful play start

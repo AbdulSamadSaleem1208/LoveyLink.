@@ -45,6 +45,8 @@ class PlayerErrorBoundary extends Component<{ children: React.ReactNode, fallbac
 export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBlocked, onPlayStart }: Props) {
     const [isReady, setIsReady] = React.useState(false);
     const [playAttempted, setPlayAttempted] = React.useState(false);
+    const [isMuted, setIsMuted] = React.useState(true); // Start muted to bypass auto-play restrictions
+    const [hasStartedPlaying, setHasStartedPlaying] = React.useState(false);
 
     if (!url) return null;
 
@@ -52,7 +54,20 @@ export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBloc
     React.useEffect(() => {
         setIsReady(false);
         setPlayAttempted(false);
+        setIsMuted(true);
+        setHasStartedPlaying(false);
     }, [url]);
+
+    // Auto-unmute after playback starts (bypass auto-play restrictions)
+    React.useEffect(() => {
+        if (hasStartedPlaying && isMuted) {
+            const unmuteTimer = setTimeout(() => {
+                console.log("Auto-unmuting player");
+                setIsMuted(false);
+            }, 300);
+            return () => clearTimeout(unmuteTimer);
+        }
+    }, [hasStartedPlaying, isMuted]);
 
     return (
         <PlayerErrorBoundary fallback={<div className="hidden">Player Error</div>}>
@@ -63,13 +78,16 @@ export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBloc
                     loop={true}
                     width="100%"
                     height="100%"
-                    volume={0.8}
+                    volume={isMuted ? 0 : 0.8}
+                    muted={isMuted}
                     playsinline={true}
                     config={{
                         youtube: {
                             playerVars: {
                                 origin: typeof window !== 'undefined' ? window.location.origin : undefined,
-                                playsinline: 1
+                                playsinline: 1,
+                                autoplay: 1,
+                                mute: isMuted ? 1 : 0
                             }
                         }
                     }}
@@ -80,6 +98,8 @@ export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBloc
                     onStart={() => {
                         console.log("Player Started");
                         setPlayAttempted(true);
+                        setHasStartedPlaying(true);
+                        if (onPlayStart) onPlayStart();
                     }}
                     onPlay={() => {
                         console.log("Player Playing");
