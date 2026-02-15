@@ -2,6 +2,9 @@ import Link from "next/link";
 import { Heart, Sparkles, Share2, QrCode, Star, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
+// Force dynamic rendering since we check auth with cookies
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   let user = null;
 
