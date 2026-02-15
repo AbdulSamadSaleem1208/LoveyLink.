@@ -29,22 +29,26 @@ export default function LovePageRenderer({ data, preview = false }: { data: Love
     const [showPlayPrompt, setShowPlayPrompt] = useState(false);
 
     useEffect(() => {
+        console.log("[LovePageRenderer] Component mounted");
         setHasMounted(true);
     }, []);
 
     // Auto-play music when page loads (if not preview)
     useEffect(() => {
         if (data.music_url && hasMounted && !preview) {
+            console.log("[LovePageRenderer] Auto-play triggered. URL:", data.music_url);
             // Start playing immediately
             setIsPlaying(true);
 
             // Show minimal prompt as backup (auto-hide if music starts)
             const timer = setTimeout(() => {
+                console.log("[LovePageRenderer] Showing play prompt");
                 setShowPlayPrompt(true);
             }, 800);
 
             // Auto-hide prompt after 3 seconds
             const hideTimer = setTimeout(() => {
+                console.log("[LovePageRenderer] Auto-hiding prompt");
                 setShowPlayPrompt(false);
             }, 3800);
 

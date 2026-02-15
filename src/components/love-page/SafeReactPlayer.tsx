@@ -52,6 +52,7 @@ export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBloc
 
     // Reset ready state when url changes
     React.useEffect(() => {
+        console.log("[SafeReactPlayer] URL changed:", url);
         setIsReady(false);
         setPlayAttempted(false);
         setIsMuted(true);
@@ -61,13 +62,19 @@ export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBloc
     // Auto-unmute after playback starts (bypass auto-play restrictions)
     React.useEffect(() => {
         if (hasStartedPlaying && isMuted) {
+            console.log("[SafeReactPlayer] Playback started, scheduling unmute in 300ms");
             const unmuteTimer = setTimeout(() => {
-                console.log("Auto-unmuting player");
+                console.log("[SafeReactPlayer] Auto-unmuting player");
                 setIsMuted(false);
             }, 300);
             return () => clearTimeout(unmuteTimer);
         }
     }, [hasStartedPlaying, isMuted]);
+
+    // Log playing state changes
+    React.useEffect(() => {
+        console.log("[SafeReactPlayer] Playing state changed:", playing, "Ready:", isReady, "Muted:", isMuted);
+    }, [playing, isReady, isMuted]);
 
     return (
         <PlayerErrorBoundary fallback={<div className="hidden">Player Error</div>}>
