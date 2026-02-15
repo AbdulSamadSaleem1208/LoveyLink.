@@ -16,3 +16,18 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Global Heart Icon Override */
+.lucide-heart {
+  color: #ff0000 !important;
+  fill: #ff0000 !important;
+  stroke: #ff0000 !important;
+}
+
+/* Ensure specific UI elements also respect this if they use different structures */
+button .lucide-heart,
+a .lucide-heart,
+div .lucide-heart {
+  color: #ff0000 !important;
+  stroke: #ff0000 !important;
+}

@@ -17,7 +17,7 @@ export default function ContactPage() {
     };
 
     const handleCopyEmail = () => {
-        navigator.clipboard.writeText("samadkayani302@gmail.com");
+        navigator.clipboard.writeText("moizkiani32@gmail.com");
         setCopied(true);
         toast.success("Email address copied to clipboard!");
         setTimeout(() => setCopied(false), 2000);
@@ -52,15 +52,14 @@ export default function ContactPage() {
                                         <Mail className="h-6 w-6 text-red-primary" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-white">Email Us</h3>
+                                        <h3 className="font-semibold text-white">Email & Phone</h3>
                                         <p className="text-gray-400 mt-1">Our friendly team is here to help.</p>
-                                        <button
-                                            onClick={handleCopyEmail}
-                                            className="text-red-primary font-medium hover:underline mt-1 flex items-center gap-2 group"
-                                        >
-                                            samadkayani302@gmail.com
-                                            {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />}
-                                        </button>
+                                        <a href="mailto:moizkiani32@gmail.com" className="text-red-primary font-bold hover:underline block mt-1">
+                                            moizkiani32@gmail.com
+                                        </a>
+                                        <a href="tel:03325188814" className="text-gray-300 hover:text-white block mt-1">
+                                            0332 5188814
+                                        </a>
                                     </div>
                                 </div>
 

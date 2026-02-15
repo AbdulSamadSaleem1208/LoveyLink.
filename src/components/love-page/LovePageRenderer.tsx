@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { Heart, Music } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import SafeReactPlayer from "./SafeReactPlayer";
 
 // Types matching DB schema approximately
 export interface LovePageData {
@@ -22,28 +23,21 @@ export interface LovePageData {
 }
 
 export default function LovePageRenderer({ data, preview = false }: { data: LovePageData; preview?: boolean }) {
-    const audioRef = useRef<HTMLAudioElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
-        if (data.music_url && !preview) {
-            // Auto-play might be blocked by browsers, show UI to play
-        }
-    }, [data.music_url, preview]);
+        setHasMounted(true);
+    }, []);
 
     const toggleMusic = () => {
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-            } else {
-                audioRef.current.play().catch(e => console.error("Playback failed", e));
-            }
-            setIsPlaying(!isPlaying);
-        }
+        setIsPlaying(!isPlaying);
     };
 
     const bgColor = data.theme_config?.backgroundColor || "#FFF1F2"; // Default blush
     const primaryColor = data.theme_config?.primaryColor || "#9B1C1C"; // Default red
+
+    if (!hasMounted) return null; // Prevent hydration mismatch for player
 
     return (
         <div
@@ -68,7 +62,11 @@ export default function LovePageRenderer({ data, preview = false }: { data: Love
                     >
                         <Music className={`h-6 w-6 ${isPlaying ? 'animate-spin' : ''}`} />
                     </button>
-                    <audio ref={audioRef} src={data.music_url} loop />
+                    <SafeReactPlayer
+                        url={data.music_url}
+                        playing={isPlaying}
+                        onToggle={() => setIsPlaying(false)}
+                    />
                 </div>
             )}
 

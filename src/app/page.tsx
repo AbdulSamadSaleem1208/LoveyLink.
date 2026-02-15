@@ -3,8 +3,23 @@ import { Heart, Sparkles, Share2, QrCode, Star, ChevronRight } from "lucide-reac
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Home() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (supabaseUrl && supabaseAnonKey) {
+      const supabase = await createClient();
+      const { data } = await supabase.auth.getUser();
+      user = data.user;
+    } else {
+      console.error("Missing Supabase Environment Variables in Home Page");
+    }
+  } catch (error) {
+    console.error("Home Page Auth Check Error:", error);
+    // Fail gracefully, treat as logged out
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white font-sans">
@@ -33,9 +48,9 @@ export default async function Home() {
                 Want to start?
               </div>
 
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight">
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight selection:bg-red-500 selection:text-white">
                 Declare your love <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-primary to-pink-hot">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff4d4d] to-[#ffccd5] drop-shadow-sm">
                   for someone special!
                 </span>
               </h1>

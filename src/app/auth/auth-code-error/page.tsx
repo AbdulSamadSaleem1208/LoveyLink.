@@ -1,9 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function AuthErrorPage() {
+function ErrorContent() {
+    const searchParams = useSearchParams();
+    const error = searchParams.get("error");
+
     return (
         <div className="min-h-screen bg-black flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -16,8 +19,13 @@ export default function AuthErrorPage() {
                     Authentication Error
                 </h2>
                 <p className="mt-2 text-center text-sm text-gray-400">
-                    There was a problem signing you in. The link may have expired or is invalid.
+                    There was a problem signing you in.
                 </p>
+                {error && (
+                    <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-200 text-sm text-center font-mono break-all">
+                        {error}
+                    </div>
+                )}
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -42,5 +50,13 @@ export default function AuthErrorPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function AuthErrorPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ErrorContent />
+        </Suspense>
     );
 }

@@ -1,10 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseAdminClient } from "@supabase/supabase-js";
 import Link from "next/link";
-import { Plus, Heart, Sparkles, MoreVertical, Trash2, Eye, QrCode as QrIcon, LayoutDashboard } from "lucide-react";
+import { Plus, Heart, Sparkles, LayoutDashboard } from "lucide-react";
 import { redirect } from "next/navigation";
 import WelcomeConfetti from "@/components/dashboard/WelcomeConfetti";
 import RefreshSubscriptionButton from "@/components/dashboard/RefreshSubscriptionButton";
+import DeletePageButton from "@/components/dashboard/DeletePageButton";
 
 export default async function Dashboard() {
     const supabase = await createClient();
@@ -14,10 +15,25 @@ export default async function Dashboard() {
         redirect("/login");
     }
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+        console.error("Missing environment variables: URL or Service Role Key");
+        return (
+            <div className="min-h-screen bg-black text-white p-10 flex items-center justify-center">
+                <div className="bg-red-900/20 border border-red-500/50 p-6 rounded-xl max-w-md text-center">
+                    <h2 className="text-xl font-bold text-red-400 mb-2">Configuration Error</h2>
+                    <p className="text-gray-300">The system is missing required configuration. Please contact the administrator.</p>
+                </div>
+            </div>
+        );
+    }
+
     // Initialize Admin Client for robust data fetching (bypass RLS)
     const supabaseAdmin = createSupabaseAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        supabaseUrl,
+        serviceRoleKey,
         {
             auth: {
                 autoRefreshToken: false,
@@ -26,63 +42,91 @@ export default async function Dashboard() {
         }
     );
 
-    const { data: lovePages } = await supabase
-        .from('love_pages')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-    // Check subscription status from SUBSCRIPTIONS table (Source of Truth)
-    // We bypass public.users because of schema cache issues on update
-    console.log(`[Dashboard] Checking subscription for user ${user.id}`);
-
-    // We can't import logDebug easily here if it's not a server component compatible export or path alias issue.
-    // Instead, let's just use console.log and trust the user will run it.
-    // Actually, I can import logs from actions.ts carefully or just copy the logging logic.
-    // Let's copy the logging logic to be safe and immediate.
-
-    const fs = require('fs');
-    const path = require('path');
-    const logPath = path.resolve('debug_dashboard.txt');
-    try {
-        fs.appendFileSync(logPath, `[${new Date().toISOString()}] Dashboard User: ${user.id}\n`);
-    } catch (e) { }
-
-    const { data: sub, error: subError } = await supabaseAdmin
-        .from('subscriptions')
-        .select('status, id')
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .maybeSingle();
+    let lovePages = null;
+    let sub = null;
+    let adminRole = null;
+    let paymentCheck: any = { data: null };
 
     try {
-        fs.appendFileSync(logPath, `[${new Date().toISOString()}] Sub result: ${JSON.stringify(sub)} Error: ${JSON.stringify(subError)}\n`);
-    } catch (e) { }
+        // Parallelize independent data fetching
+        const results = await Promise.all([
+            // 1. Fetch Love Pages
+            supabase
+                .from('love_pages')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false }),
+
+            // 2. Check subscription status (Source of Truth)
+            supabaseAdmin
+                .from('subscriptions')
+                .select('status, id, current_period_end')
+                .eq('user_id', user.id)
+                .eq('status', 'active')
+                .maybeSingle(),
+
+            // 3. Check admin role
+            supabase
+                .from('admin_roles')
+                .select('role')
+                .eq('user_id', user.id)
+                .single(),
+
+            // 4. Fallback: Check payment_requests (optimistically fetch to avoid waterfall)
+            supabaseAdmin
+                .from('payment_requests')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('status', 'approved')
+                .limit(1)
+                .maybeSingle()
+        ]);
+
+        lovePages = results[0].data;
+        sub = results[1].data;
+        adminRole = results[2].data;
+        paymentCheck = results[3];
+
+    } catch (error) {
+        console.error("Dashboard Data Fetch Error:", error);
+        // We can return an error state or just allow partial data or nulls
+        // For now, let's just log it and proceed with nulls, which the UI handles (shows "No pages yet")
+    }
 
     let isPremium = !!sub;
 
-    if (!isPremium) {
-        // Fallback: Check payment_requests directly
-        const { data: payment } = await supabaseAdmin
-            .from('payment_requests')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('status', 'approved')
-            .limit(1)
-            .maybeSingle();
+    // Check for Expiry
+    if (isPremium && sub?.current_period_end) {
+        const expiryDate = new Date(sub.current_period_end);
+        const now = new Date();
+        if (expiryDate < now) {
+            console.log(`[Dashboard] Subscription expired for ${user.id}. Expiry: ${expiryDate}`);
+            // Auto-expire logic can be done here or lazily.
+            // For immediate effect on UI, mark as not premium.
+            // Ideally, we fire a background task to update DB, but for now let's just show as expired.
+            // We can also trigger a DB update here but better to separate concerns or use a cron.
+            // Let's update it here to be robust as requested.
+            await supabaseAdmin
+                .from('subscriptions')
+                .update({ status: 'expired' })
+                .eq('id', sub.id);
 
-        if (payment) {
+            await supabaseAdmin
+                .from('users')
+                .update({ subscription_status: 'expired' })
+                .eq('id', user.id);
+
+            isPremium = false;
+        }
+    }
+
+    if (!isPremium) {
+        // Use the pre-fetched payment check result
+        if (paymentCheck.data) {
             console.log(`[Dashboard] Fallback Premium Granted via payment_requests for ${user.id}`);
             isPremium = true;
         }
     }
-
-    // Check admin role
-    const { data: adminRole } = await supabase
-        .from('admin_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
 
     // Check for welcome flag in metadata
     const showWelcome = user.user_metadata?.show_premium_welcome;
@@ -148,7 +192,9 @@ export default async function Dashboard() {
                 {lovePages && lovePages.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {lovePages.map((page) => (
-                            <div key={page.id} className="bg-background-card border border-white/10 rounded-2xl p-6 shadow-sm hover:border-red-primary/50 transition-all group">
+                            <div key={page.id} className="bg-background-card border border-white/10 rounded-2xl p-6 shadow-sm hover:border-red-primary/50 transition-all group relative">
+                                <DeletePageButton pageId={page.id} />
+
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="h-12 w-12 bg-red-primary/10 rounded-full flex items-center justify-center text-red-primary group-hover:bg-red-primary group-hover:text-white transition-colors">
                                         <Heart className="w-6 h-6 fill-current" />

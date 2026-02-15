@@ -17,7 +17,7 @@ export default function EasypaisaModal({ isOpen, onClose }: EasypaisaModalProps)
     const [copied, setCopied] = useState(false);
     const router = useRouter();
 
-    const ACCOUNT_NUMBER = "03339591234";
+    const ACCOUNT_NUMBER = "03325188814";
     const ACCOUNT_TITLE = "Abdul Samad Saleem";
 
     const handleCopy = () => {

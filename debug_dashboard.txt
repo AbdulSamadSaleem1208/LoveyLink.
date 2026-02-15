@@ -444,3 +444,39 @@
 [2026-02-15T09:47:16.949Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
 [2026-02-15T09:47:17.063Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
 [2026-02-15T09:47:17.241Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:00:42.105Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
+[2026-02-15T10:00:42.114Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
+[2026-02-15T10:00:42.490Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
+[2026-02-15T10:00:42.692Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
+[2026-02-15T10:00:42.869Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
+[2026-02-15T10:00:43.040Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
+[2026-02-15T10:00:43.052Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:00:43.059Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:00:43.065Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:00:43.292Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:00:43.379Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:00:43.619Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:00:43.865Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
+[2026-02-15T10:00:44.029Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
+[2026-02-15T10:00:44.210Z] Dashboard User: fd24fb79-b9e5-4622-820d-b67126bcbc22
+[2026-02-15T10:00:44.217Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:00:44.365Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:00:44.510Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:01:27.808Z] Dashboard User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-15T10:01:28.039Z] Dashboard User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-15T10:01:28.072Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:01:28.187Z] Dashboard User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-15T10:01:28.303Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:01:28.438Z] Dashboard User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-15T10:01:28.635Z] Dashboard User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-15T10:01:28.722Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:01:28.724Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:01:28.822Z] Dashboard User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-15T10:01:28.915Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:01:29.217Z] Dashboard User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-15T10:01:29.301Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:01:29.432Z] Dashboard User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-15T10:01:29.496Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:01:29.647Z] Dashboard User: 36d977d5-bd9e-4f3c-ad53-d73b8366d5bd
+[2026-02-15T10:01:29.802Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}
+[2026-02-15T10:01:29.955Z] Sub result: null Error: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.subscriptions' in the schema cache"}

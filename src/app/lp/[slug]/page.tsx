@@ -14,45 +14,50 @@ type Props = {
 export async function generateMetadata(
     { params }: Props,
 ): Promise<Metadata> {
-    const resolvedParams = await params;
-    const slug = resolvedParams.slug;
-    const supabase = await createServerClient();
+    try {
+        const resolvedParams = await params;
+        const slug = resolvedParams.slug;
+        const supabase = await createServerClient();
 
-    const { data: page } = await supabase
-        .from('love_pages')
-        .select('title, recipient_name')
-        .eq('slug', slug)
-        .single();
+        const { data: page } = await supabase
+            .from('love_pages')
+            .select('title, recipient_name')
+            .eq('slug', slug)
+            .single();
 
-    if (!page) return { title: 'Love Page Not Found' };
+        if (!page) return { title: 'Love Page Not Found' };
 
-    return {
-        title: `${page.title} - For ${page.recipient_name}`,
-        description: `A special love page dedicated to ${page.recipient_name}.`,
-    };
+        return {
+            title: `${page.title} - For ${page.recipient_name}`,
+            description: `A special love page dedicated to ${page.recipient_name}.`,
+        };
+    } catch (error) {
+        console.error("Metadata generation error:", error);
+        return { title: 'Love Link' };
+    }
 }
 
 export default async function PublicLovePage({ params }: Props) {
-    const resolvedParams = await params;
-    const slug = resolvedParams.slug;
-    const supabase = await createServerClient();
+    try {
+        const resolvedParams = await params;
+        const slug = resolvedParams.slug;
+        const supabase = await createServerClient();
 
-    // Fetch page data
-    const { data: page, error } = await supabase
-        .from('love_pages')
-        .select('*')
-        .eq('slug', slug)
-        .single();
+        // Fetch page data
+        const { data: page, error } = await supabase
+            .from('love_pages')
+            .select('*')
+            .eq('slug', slug)
+            .single();
 
-    if (error || !page || !page.published) {
+        if (error || !page || !page.published) {
+            console.error("Page fetch error or not found:", error); // Log error for debugging
+            notFound();
+        }
+
+        return <LovePageRenderer data={page} />;
+    } catch (error) {
+        console.error("Public Page Error:", error);
         notFound();
     }
-
-    // Record page view (non-blocking)
-    // We can do this via a useEffect in a client component or here server-side if strict
-    // But doing it here might be tricky with async if we don't await. 
-    // Better to just fire and forget or use client side analytics.
-    // For now, let's keep it simple.
-
-    return <LovePageRenderer data={page} />;
 }

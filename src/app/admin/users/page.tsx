@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { BackButton } from "@/components/ui/back-button";
+import RevokePremiumButton from "@/components/admin/RevokePremiumButton";
 
 export const dynamic = 'force-dynamic';
 
@@ -53,8 +54,11 @@ export default async function AdminUsersPage() {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {new Date(user.created_at).toLocaleDateString()}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center justify-end">
                                     <button className="text-indigo-600 hover:text-indigo-900">Edit</button>
+                                    {user.subscription_status === 'active' && (
+                                        <RevokePremiumButton userId={user.id} />
+                                    )}
                                 </td>
                             </tr>
                         ))}

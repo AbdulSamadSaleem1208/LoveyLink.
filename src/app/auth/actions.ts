@@ -20,12 +20,16 @@ const getSiteUrl = async () => {
 
     if (!url) {
         const reqHeaders = await headers();
-        const origin = reqHeaders.get("origin");
-        if (origin) return origin;
-        url = "http://localhost:3000";
+        const origin = reqHeaders.get("origin") || reqHeaders.get("host"); // Fallback to host if origin missing
+        if (origin) {
+            url = origin.startsWith('http') ? origin : `http://${origin}`;
+        } else {
+            url = "http://localhost:3000";
+        }
     }
 
-    return url;
+    // Remove trailing slash if present
+    return url.replace(/\/$/, "");
 };
 
 export async function login(formData: FormData) {
@@ -115,7 +119,7 @@ export async function forgotPassword(data: { email: string }) {
     try {
         const supabase = await createClient();
         const origin = await getSiteUrl();
-        const redirectUrl = `${origin}/auth/callback?next=${encodeURIComponent('/update-password')}`;
+        const redirectUrl = `${origin}/auth/callback?next=/update-password`;
 
         console.log("Forgot Password Request:", data.email);
         console.log("Resolved Origin:", origin);
