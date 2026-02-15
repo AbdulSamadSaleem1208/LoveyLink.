@@ -34,7 +34,8 @@ export default async function SuccessPage({ params }: Props) {
         } else if (process.env.VERCEL_URL) {
             siteUrl = `https://${process.env.VERCEL_URL}`;
         } else {
-            siteUrl = "http://localhost:3000";
+            // Use production domain as fallback instead of localhost
+            siteUrl = "https://loveylink.net";
         }
     }
 

@@ -24,7 +24,8 @@ const getSiteUrl = async () => {
         if (origin) {
             url = origin.startsWith('http') ? origin : `http://${origin}`;
         } else {
-            url = "http://localhost:3000";
+            // Use production domain as fallback instead of localhost
+            url = "https://loveylink.net";
         }
     }
 
