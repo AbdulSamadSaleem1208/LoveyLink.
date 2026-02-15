@@ -95,26 +95,16 @@ export default async function Dashboard() {
 
     let isPremium = !!sub;
 
-    // Check for Expiry
+    // Check for Expiry using utility function
     if (isPremium && sub?.current_period_end) {
         const expiryDate = new Date(sub.current_period_end);
         const now = new Date();
         if (expiryDate < now) {
             console.log(`[Dashboard] Subscription expired for ${user.id}. Expiry: ${expiryDate}`);
-            // Auto-expire logic can be done here or lazily.
-            // For immediate effect on UI, mark as not premium.
-            // Ideally, we fire a background task to update DB, but for now let's just show as expired.
-            // We can also trigger a DB update here but better to separate concerns or use a cron.
-            // Let's update it here to be robust as requested.
-            await supabaseAdmin
-                .from('subscriptions')
-                .update({ status: 'expired' })
-                .eq('id', sub.id);
 
-            await supabaseAdmin
-                .from('users')
-                .update({ subscription_status: 'expired' })
-                .eq('id', user.id);
+            // Use utility function to expire subscription
+            const { expireUserSubscription } = await import('@/lib/subscription-utils');
+            await expireUserSubscription(user.id);
 
             isPremium = false;
         }
@@ -122,6 +112,7 @@ export default async function Dashboard() {
 
     if (!isPremium) {
         // Use the pre-fetched payment check result
+        // Only grant premium if payment is approved AND not revoked
         if (paymentCheck.data) {
             console.log(`[Dashboard] Fallback Premium Granted via payment_requests for ${user.id}`);
             isPremium = true;

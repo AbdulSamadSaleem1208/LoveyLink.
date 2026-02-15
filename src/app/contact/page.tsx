@@ -17,7 +17,7 @@ export default function ContactPage() {
     };
 
     const handleCopyEmail = () => {
-        navigator.clipboard.writeText("moizkiani32@gmail.com");
+        navigator.clipboard.writeText("loveylink9@gmail.com");
         setCopied(true);
         toast.success("Email address copied to clipboard!");
         setTimeout(() => setCopied(false), 2000);
@@ -54,11 +54,11 @@ export default function ContactPage() {
                                     <div>
                                         <h3 className="font-semibold text-white">Email & Phone</h3>
                                         <p className="text-gray-400 mt-1">Our friendly team is here to help.</p>
-                                        <a href="mailto:moizkiani32@gmail.com" className="text-red-primary font-bold hover:underline block mt-1">
-                                            moizkiani32@gmail.com
+                                        <a href="mailto:loveylink9@gmail.com" className="text-red-primary font-bold hover:underline block mt-1">
+                                            loveylink9@gmail.com
                                         </a>
-                                        <a href="tel:03325188814" className="text-gray-300 hover:text-white block mt-1">
-                                            0332 5188814
+                                        <a href="tel:03158169828" className="text-gray-300 hover:text-white block mt-1">
+                                            0315 8169828
                                         </a>
                                     </div>
                                 </div>

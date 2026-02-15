@@ -1,7 +1,10 @@
 "use client";
 
+
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 
 function ErrorContent() {
     const searchParams = useSearchParams();

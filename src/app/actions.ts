@@ -60,6 +60,7 @@ export async function checkSubscriptionStatus() {
         logDebug(`[CheckSubscription] User: ${user.id}, Status: ${userRef?.subscription_status}, Error: ${error?.message}`);
 
         // 3. Tertiary Fallback: Check payment_requests table (Stable table)
+        // Only consider approved payments that haven't been revoked
         logDebug(`[CheckSubscription] Attempting Tertiary Fallback for ${user.id}...`);
         const { data: payment } = await supabaseAdmin
             .from('payment_requests')
