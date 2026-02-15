@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { checkSubscriptionStatus } from "@/app/actions";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AnimatePresence, motion } from "framer-motion";
@@ -109,8 +108,15 @@ export default function CreateLovePage() {
                 return;
             }
 
-            // Check Subscription Status (Server-Side)
-            const { isPremium } = await checkSubscriptionStatus();
+            // Check Subscription Status (Client-Side)
+            const { data: subscription } = await supabase
+                .from('subscriptions')
+                .select('status')
+                .eq('user_id', user.id)
+                .eq('status', 'active')
+                .maybeSingle();
+
+            const isPremium = !!subscription;
 
             if (!isPremium) {
                 toast.error("Upgrade to Premium to publish & unlock QR code");
