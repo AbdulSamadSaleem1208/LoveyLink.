@@ -128,3 +128,9 @@
 [2026-02-15T20:05:31.900Z] [CheckSubscription] User: 7f28cd10-003c-4049-949d-edc25bac8aff, Status: free, Error: undefined
 [2026-02-15T20:05:31.902Z] [CheckSubscription] Attempting Tertiary Fallback for 7f28cd10-003c-4049-949d-edc25bac8aff...
 [2026-02-15T20:05:32.311Z] [CheckSubscription] No approved payment found for 7f28cd10-003c-4049-949d-edc25bac8aff in fallback.
+[2026-02-15T22:03:25.652Z] [CheckSubscription] User: a2e24868-f404-410d-a098-28347142fb23, Status: free, Error: undefined
+[2026-02-15T22:03:25.655Z] [CheckSubscription] Attempting Tertiary Fallback for a2e24868-f404-410d-a098-28347142fb23...
+[2026-02-15T22:03:26.206Z] [CheckSubscription] No approved payment found for a2e24868-f404-410d-a098-28347142fb23 in fallback.
+[2026-02-15T22:04:51.680Z] [CheckSubscription] User: a2e24868-f404-410d-a098-28347142fb23, Status: active, Error: undefined
+[2026-02-15T22:04:51.682Z] [CheckSubscription] Attempting Tertiary Fallback for a2e24868-f404-410d-a098-28347142fb23...
+[2026-02-15T22:04:52.251Z] [CheckSubscription] Found approved payment request for a2e24868-f404-410d-a098-28347142fb23. Fallback Premium Granted.

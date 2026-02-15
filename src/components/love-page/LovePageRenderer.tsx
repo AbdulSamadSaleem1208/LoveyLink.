@@ -38,21 +38,39 @@ export default function LovePageRenderer({ data, preview = false }: { data: Love
             // Start playing
             setIsPlaying(true);
 
-            // If auto-play is blocked, show prompt after 2 seconds
+            // Show prompt immediately for mobile users
+            // They can click to start if auto-play is blocked
             const timer = setTimeout(() => {
-                // Only show prompt if we tried to play but user hasn't interacted
-                if (isPlaying) {
-                    setShowPlayPrompt(true);
-                }
-            }, 2000);
+                setShowPlayPrompt(true);
+            }, 1000);
 
             return () => clearTimeout(timer);
         }
-    }, [data.music_url, hasMounted, preview, isPlaying]);
+    }, [data.music_url, hasMounted, preview]);
+
+    // Handle auto-play blocked callback
+    const handleAutoPlayBlocked = () => {
+        console.log("Auto-play blocked, showing prompt");
+        setShowPlayPrompt(true);
+        setIsPlaying(false); // Reset to stopped state
+    };
+
+    // Handle successful play start
+    const handlePlayStart = () => {
+        console.log("Music started playing");
+        setShowPlayPrompt(false); // Hide prompt when music starts
+    };
 
     const toggleMusic = () => {
         setIsPlaying(!isPlaying);
         setShowPlayPrompt(false); // Hide prompt when user interacts
+    };
+
+    // Force play when prompt is clicked
+    const handlePromptClick = () => {
+        console.log("Prompt clicked, forcing play");
+        setIsPlaying(true);
+        setShowPlayPrompt(false);
     };
 
     const bgColor = data.theme_config?.backgroundColor || "#FFF1F2"; // Default blush
@@ -93,12 +111,12 @@ export default function LovePageRenderer({ data, preview = false }: { data: Love
                     {/* Auto-play prompt */}
                     {showPlayPrompt && (
                         <div
-                            onClick={toggleMusic}
+                            onClick={handlePromptClick}
                             className="absolute top-16 right-0 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border border-red-100 cursor-pointer hover:bg-white transition-all animate-bounce"
                             style={{ color: primaryColor }}
                         >
                             <p className="text-sm font-medium whitespace-nowrap">
-                                🎵 Click to play music
+                                🎵 Tap to play music
                             </p>
                         </div>
                     )}
@@ -106,8 +124,9 @@ export default function LovePageRenderer({ data, preview = false }: { data: Love
                     <SafeReactPlayer
                         url={data.music_url}
                         playing={isPlaying}
-                        onToggle={() => setIsPlaying(false)}
-                        onAutoPlayBlocked={() => setShowPlayPrompt(true)}
+                        onToggle={toggleMusic}
+                        onAutoPlayBlocked={handleAutoPlayBlocked}
+                        onPlayStart={handlePlayStart}
                     />
                 </div>
             )}

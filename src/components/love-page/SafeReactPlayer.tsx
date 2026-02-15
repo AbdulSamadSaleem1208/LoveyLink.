@@ -13,6 +13,7 @@ interface Props {
     onToggle?: () => void;
     onError?: (error: any) => void;
     onAutoPlayBlocked?: () => void;
+    onPlayStart?: () => void;
 }
 
 interface State {
@@ -41,7 +42,7 @@ class PlayerErrorBoundary extends Component<{ children: React.ReactNode, fallbac
     }
 }
 
-export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBlocked }: Props) {
+export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBlocked, onPlayStart }: Props) {
     const [isReady, setIsReady] = React.useState(false);
     const [playAttempted, setPlayAttempted] = React.useState(false);
 
@@ -83,6 +84,9 @@ export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBloc
                     onPlay={() => {
                         console.log("Player Playing");
                         setPlayAttempted(true);
+                        if (onPlayStart) {
+                            onPlayStart(); // Notify parent that music started
+                        }
                     }}
                     onPause={() => {
                         // If we tried to play but got paused immediately, auto-play might be blocked
