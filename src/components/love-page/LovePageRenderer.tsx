@@ -23,15 +23,36 @@ export interface LovePageData {
 }
 
 export default function LovePageRenderer({ data, preview = false }: { data: LovePageData; preview?: boolean }) {
-    const [isPlaying, setIsPlaying] = useState(false);
+    // Auto-start music if available, unless in preview mode
+    const [isPlaying, setIsPlaying] = useState(!preview && !!data.music_url);
     const [hasMounted, setHasMounted] = useState(false);
+    const [showPlayPrompt, setShowPlayPrompt] = useState(false);
 
     useEffect(() => {
         setHasMounted(true);
     }, []);
 
+    // Auto-play music when page loads (if not preview)
+    useEffect(() => {
+        if (data.music_url && hasMounted && !preview) {
+            // Start playing
+            setIsPlaying(true);
+
+            // If auto-play is blocked, show prompt after 2 seconds
+            const timer = setTimeout(() => {
+                // Only show prompt if we tried to play but user hasn't interacted
+                if (isPlaying) {
+                    setShowPlayPrompt(true);
+                }
+            }, 2000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [data.music_url, hasMounted, preview, isPlaying]);
+
     const toggleMusic = () => {
         setIsPlaying(!isPlaying);
+        setShowPlayPrompt(false); // Hide prompt when user interacts
     };
 
     const bgColor = data.theme_config?.backgroundColor || "#FFF1F2"; // Default blush
@@ -57,15 +78,36 @@ export default function LovePageRenderer({ data, preview = false }: { data: Love
                 <div className="fixed top-4 right-4 z-50">
                     <button
                         onClick={toggleMusic}
-                        className="bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-lg border border-red-100 hover:scale-110 transition-transform"
+                        className="bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-lg border border-red-100 hover:scale-110 transition-transform relative"
                         style={{ color: primaryColor }}
+                        aria-label={isPlaying ? "Pause music" : "Play music"}
                     >
-                        <Music className={`h-6 w-6 ${isPlaying ? 'animate-spin' : ''}`} />
+                        <Music className={`h-6 w-6 ${isPlaying ? 'animate-pulse' : ''}`} />
+                        {!isPlaying && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-0 h-0 border-l-8 border-l-current border-y-6 border-y-transparent ml-1" />
+                            </div>
+                        )}
                     </button>
+
+                    {/* Auto-play prompt */}
+                    {showPlayPrompt && (
+                        <div
+                            onClick={toggleMusic}
+                            className="absolute top-16 right-0 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border border-red-100 cursor-pointer hover:bg-white transition-all animate-bounce"
+                            style={{ color: primaryColor }}
+                        >
+                            <p className="text-sm font-medium whitespace-nowrap">
+                                🎵 Click to play music
+                            </p>
+                        </div>
+                    )}
+
                     <SafeReactPlayer
                         url={data.music_url}
                         playing={isPlaying}
                         onToggle={() => setIsPlaying(false)}
+                        onAutoPlayBlocked={() => setShowPlayPrompt(true)}
                     />
                 </div>
             )}

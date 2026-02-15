@@ -12,6 +12,7 @@ interface Props {
     playing: boolean;
     onToggle?: () => void;
     onError?: (error: any) => void;
+    onAutoPlayBlocked?: () => void;
 }
 
 interface State {
@@ -40,14 +41,16 @@ class PlayerErrorBoundary extends Component<{ children: React.ReactNode, fallbac
     }
 }
 
-export default function SafeReactPlayer({ url, playing, onToggle }: Props) {
+export default function SafeReactPlayer({ url, playing, onToggle, onAutoPlayBlocked }: Props) {
     const [isReady, setIsReady] = React.useState(false);
+    const [playAttempted, setPlayAttempted] = React.useState(false);
 
     if (!url) return null;
 
     // Reset ready state when url changes
     React.useEffect(() => {
         setIsReady(false);
+        setPlayAttempted(false);
     }, [url]);
 
     return (
@@ -73,10 +76,29 @@ export default function SafeReactPlayer({ url, playing, onToggle }: Props) {
                         console.log("Player Ready");
                         setIsReady(true);
                     }}
-                    onStart={() => console.log("Player Started")}
-                    onPlay={() => console.log("Player Playing")}
+                    onStart={() => {
+                        console.log("Player Started");
+                        setPlayAttempted(true);
+                    }}
+                    onPlay={() => {
+                        console.log("Player Playing");
+                        setPlayAttempted(true);
+                    }}
+                    onPause={() => {
+                        // If we tried to play but got paused immediately, auto-play might be blocked
+                        if (playing && !playAttempted && onAutoPlayBlocked) {
+                            console.log("Auto-play might be blocked");
+                            onAutoPlayBlocked();
+                        }
+                    }}
                     onError={(e: any) => {
                         console.error("Internal Player Error:", e);
+                        // Check if it's an auto-play error
+                        if (e && (e.type === 'autoplayblocked' || e.message?.includes('autoplay'))) {
+                            if (onAutoPlayBlocked) {
+                                onAutoPlayBlocked();
+                            }
+                        }
                         if (onToggle && playing) onToggle();
                     }}
                 />
