@@ -61,3 +61,19 @@
 [2026-02-12T17:52:07.211Z] [CheckSubscription] Attempting Tertiary Fallback for ce0e2b72-be1b-4c68-910f-2b47619da983...
 [2026-02-12T17:52:07.530Z] [CheckSubscription] No approved payment found for ce0e2b72-be1b-4c68-910f-2b47619da983 in fallback.
 [2026-02-12T17:52:07.531Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-14T19:20:27.340Z] [CheckSubscription] User: d4f1ae90-a7db-4ad2-b7e1-dae3a31b25d0, Status: undefined, Error: Could not find the table 'public.users' in the schema cache
+[2026-02-14T19:20:27.341Z] [CheckSubscription] Attempting Tertiary Fallback for d4f1ae90-a7db-4ad2-b7e1-dae3a31b25d0...
+[2026-02-14T19:20:27.660Z] [CheckSubscription] No approved payment found for d4f1ae90-a7db-4ad2-b7e1-dae3a31b25d0 in fallback.
+[2026-02-14T19:20:27.661Z] Error fetching subscription status: {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.users' in the schema cache"}
+[2026-02-14T19:36:20.892Z] [CheckSubscription] User: 238bf674-1864-4271-984a-bcbfe016f8f9, Status: free, Error: undefined
+[2026-02-14T19:36:20.893Z] [CheckSubscription] Attempting Tertiary Fallback for 238bf674-1864-4271-984a-bcbfe016f8f9...
+[2026-02-14T19:36:21.404Z] [CheckSubscription] No approved payment found for 238bf674-1864-4271-984a-bcbfe016f8f9 in fallback.
+[2026-02-14T19:38:06.344Z] [CheckSubscription] User: 238bf674-1864-4271-984a-bcbfe016f8f9, Status: active, Error: undefined
+[2026-02-14T19:38:06.346Z] [CheckSubscription] Attempting Tertiary Fallback for 238bf674-1864-4271-984a-bcbfe016f8f9...
+[2026-02-14T19:38:06.737Z] [CheckSubscription] Found approved payment request for 238bf674-1864-4271-984a-bcbfe016f8f9. Fallback Premium Granted.
+[2026-02-14T19:52:22.735Z] [CheckSubscription] User: 0a5b3aae-eea3-46bf-810a-cb5d8ddf8afc, Status: free, Error: undefined
+[2026-02-14T19:52:22.736Z] [CheckSubscription] Attempting Tertiary Fallback for 0a5b3aae-eea3-46bf-810a-cb5d8ddf8afc...
+[2026-02-14T19:52:23.158Z] [CheckSubscription] No approved payment found for 0a5b3aae-eea3-46bf-810a-cb5d8ddf8afc in fallback.
+[2026-02-14T19:53:47.108Z] [CheckSubscription] User: 0a5b3aae-eea3-46bf-810a-cb5d8ddf8afc, Status: active, Error: undefined
+[2026-02-14T19:53:47.109Z] [CheckSubscription] Attempting Tertiary Fallback for 0a5b3aae-eea3-46bf-810a-cb5d8ddf8afc...
+[2026-02-14T19:53:48.059Z] [CheckSubscription] Found approved payment request for 0a5b3aae-eea3-46bf-810a-cb5d8ddf8afc. Fallback Premium Granted.
