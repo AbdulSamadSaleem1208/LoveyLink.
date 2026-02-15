@@ -1,31 +1,87 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import type { CookieOptions } from '@supabase/ssr'
 
-console.log('DEBUG: Middleware loaded');
+export async function middleware(request: NextRequest) {
+    let response = NextResponse.next({
+        request: {
+            headers: request.headers,
+        },
+    })
 
-export function middleware(request: NextRequest) {
-    console.log('DEBUG: Middleware request:', request.nextUrl.pathname);
-    // 1. Define the protected paths
-    const publicPaths = ['/about', '/features', '/contact', '/privacy', '/terms', '/login', '/auth', '/register', '/public', '/forgot-password', '/update-password'];
-    const isPublic = publicPaths.some(path => request.nextUrl.pathname.startsWith(path)) || request.nextUrl.pathname === '/' || request.nextUrl.pathname.startsWith('/lp/');
+    // Add security headers to prevent caching of authenticated pages
+    response.headers.set('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
 
-    // 2. Check for Supabase session cookie
-    // The cookie name pattern is usually `sb-<project-ref>-auth-token`
-    // We check for *any* cookie starting with `sb-` and ending with `-auth-token` OR standard `sb-access-token`
-    const hasSession = request.cookies.getAll().some(cookie =>
-        (cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token')) ||
-        cookie.name === 'sb-access-token'
-    );
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return request.cookies.get(name)?.value
+                },
+                set(name: string, value: string, options: CookieOptions) {
+                    request.cookies.set({
+                        name,
+                        value,
+                        ...options,
+                    })
+                    response = NextResponse.next({
+                        request: {
+                            headers: request.headers,
+                        },
+                    })
+                    response.cookies.set({
+                        name,
+                        value,
+                        ...options,
+                    })
+                },
+                remove(name: string, options: CookieOptions) {
+                    request.cookies.set({
+                        name,
+                        value: '',
+                        ...options,
+                    })
+                    response = NextResponse.next({
+                        request: {
+                            headers: request.headers,
+                        },
+                    })
+                    response.cookies.set({
+                        name,
+                        value: '',
+                        ...options,
+                    })
+                },
+            },
+        }
+    )
 
-    // 3. Auth Protection Logic
-    if (!hasSession && !isPublic) {
-        // No session cookie found on a protected route
+    // Validate actual session, not just cookie existence
+    const { data: { session } } = await supabase.auth.getSession()
+
+    // Define public paths
+    const publicPaths = [
+        '/about', '/features', '/contact', '/privacy', '/terms',
+        '/login', '/auth', '/register', '/forgot-password', '/update-password',
+        '/public', '/', '/lp'
+    ]
+
+    const isPublic = publicPaths.some(path =>
+        request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
+    )
+
+    // Redirect to login if no valid session on protected route
+    if (!session && !isPublic) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
         return NextResponse.redirect(url)
     }
 
-    // 4. Continue
-    return NextResponse.next()
+    return response
 }
 
 export const config = {
@@ -35,7 +91,7 @@ export const config = {
          * - _next/static (static files)
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
-         * Feel free to modify this pattern to include more paths.
+         * - images and other static assets
          */
         '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],

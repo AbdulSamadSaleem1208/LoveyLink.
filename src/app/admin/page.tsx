@@ -1,32 +1,16 @@
-import { createClient } from "@supabase/supabase-js";
+import { getAdminStats } from "./actions";
 import { Users, CreditCard, Heart, QrCode } from "lucide-react";
 
+// Force dynamic rendering and prevent caching
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 export default async function AdminDashboard() {
-    const supabaseAdmin = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        {
-            auth: {
-                autoRefreshToken: false,
-                persistSession: false
-            }
-        }
-    );
+    // Fetch stats from server action (uses service role securely)
+    const stats = await getAdminStats();
 
-    // Parallel fetching for stats
-    const [
-        { count: userCount },
-        { count: pageCount },
-        { count: subCount },
-        { count: qrScanCount }
-    ] = await Promise.all([
-        supabaseAdmin.from('users').select('*', { count: 'exact', head: true }),
-        supabaseAdmin.from('love_pages').select('*', { count: 'exact', head: true }),
-        supabaseAdmin.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-        supabaseAdmin.from('qr_scans').select('*', { count: 'exact', head: true })
-    ]);
+    const { userCount, pageCount, subCount, qrScanCount } = stats;
 
     return (
         <div>
@@ -35,25 +19,25 @@ export default async function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatCard
                     title="Total Users"
-                    value={userCount || 0}
+                    value={userCount}
                     icon={<Users className="w-6 h-6 text-blue-500" />}
                     bg="bg-blue-50"
                 />
                 <StatCard
                     title="Active Subscriptions"
-                    value={subCount || 0}
+                    value={subCount}
                     icon={<CreditCard className="w-6 h-6 text-green-500" />}
                     bg="bg-green-50"
                 />
                 <StatCard
                     title="Love Pages Created"
-                    value={pageCount || 0}
+                    value={pageCount}
                     icon={<Heart className="w-6 h-6 text-red-500" />}
                     bg="bg-red-50"
                 />
                 <StatCard
                     title="Total QR Scans"
-                    value={qrScanCount || 0}
+                    value={qrScanCount}
                     icon={<QrCode className="w-6 h-6 text-purple-500" />}
                     bg="bg-purple-50"
                 />

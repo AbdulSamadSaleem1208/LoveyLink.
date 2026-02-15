@@ -20,6 +20,11 @@ interface LovePageData {
     music_url: string;
 }
 
+// Force dynamic rendering - prevent static generation and caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 export default function CreateLovePage() {
     const router = useRouter();
     const [step, setStep] = useState(1);
