@@ -1,4 +1,4 @@
-import { getAdminStats } from "./actions";
+import { getAdminStats } from "@/app/admin/actions";
 import { Users, CreditCard, Heart, QrCode } from "lucide-react";
 
 // Force dynamic rendering and prevent caching

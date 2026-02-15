@@ -1,4 +1,4 @@
-import { getAdminUsers } from "../actions";
+import { getAdminUsers } from "@/app/admin/actions";
 import { BackButton } from "@/components/ui/back-button";
 import RevokePremiumButton from "@/components/admin/RevokePremiumButton";
 
