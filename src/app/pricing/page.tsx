@@ -1,11 +1,9 @@
 "use client";
 
-import { Check, Heart, Sparkles, Crown } from "lucide-react";
+import { Check, Heart, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { checkSubscriptionStatus } from "@/app/actions";
-import Link from "next/link";
 
 import EasypaisaModal from "@/components/payment/EasypaisaModal";
 

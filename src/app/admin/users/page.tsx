@@ -1,17 +1,26 @@
-import { getAdminUsers } from "@/app/admin/actions";
+import { createClient } from "@supabase/supabase-js";
 import { BackButton } from "@/components/ui/back-button";
 import RevokePremiumButton from "@/components/admin/RevokePremiumButton";
 
-// Force dynamic rendering and prevent caching
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const fetchCache = 'force-no-store';
 
 export default async function AdminUsersPage() {
-    // Fetch users from server action (uses service role securely)
-    const users = await getAdminUsers();
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        }
+    );
 
-
+    const { data: users } = await supabaseAdmin
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
 
     return (
         <div>

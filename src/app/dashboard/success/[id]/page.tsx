@@ -8,11 +8,6 @@ type Props = {
     params: Promise<{ id: string }>
 }
 
-// Force dynamic rendering - prevent static generation and caching
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const fetchCache = 'force-no-store';
-
 export default async function SuccessPage({ params }: Props) {
     const resolvedParams = await params;
     const id = resolvedParams.id;

@@ -1,15 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseAdminClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import { Plus, Heart, Sparkles, LayoutDashboard } from "lucide-react";
 import { redirect } from "next/navigation";
 import WelcomeConfetti from "@/components/dashboard/WelcomeConfetti";
 import RefreshSubscriptionButton from "@/components/dashboard/RefreshSubscriptionButton";
 import DeletePageButton from "@/components/dashboard/DeletePageButton";
-
-// Force dynamic rendering - prevent static generation and caching
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const fetchCache = 'force-no-store';
 
 export default async function Dashboard() {
     const supabase = await createClient();
@@ -19,38 +15,65 @@ export default async function Dashboard() {
         redirect("/login");
     }
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+        console.error("Missing environment variables: URL or Service Role Key");
+        return (
+            <div className="min-h-screen bg-black text-white p-10 flex items-center justify-center">
+                <div className="bg-red-900/20 border border-red-500/50 p-6 rounded-xl max-w-md text-center">
+                    <h2 className="text-xl font-bold text-red-400 mb-2">Configuration Error</h2>
+                    <p className="text-gray-300">The system is missing required configuration. Please contact the administrator.</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Initialize Admin Client for robust data fetching (bypass RLS)
+    const supabaseAdmin = createSupabaseAdminClient(
+        supabaseUrl,
+        serviceRoleKey,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false
+            }
+        }
+    );
+
     let lovePages = null;
     let sub = null;
     let adminRole = null;
     let paymentCheck: any = { data: null };
 
     try {
-        // Parallelize independent data fetching using RLS-compliant queries
+        // Parallelize independent data fetching
         const results = await Promise.all([
-            // 1. Fetch Love Pages (RLS: user can only see their own pages)
+            // 1. Fetch Love Pages
             supabase
                 .from('love_pages')
                 .select('*')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false }),
 
-            // 2. Check subscription status (RLS: user can only see their own subscription)
-            supabase
+            // 2. Check subscription status (Source of Truth)
+            supabaseAdmin
                 .from('subscriptions')
                 .select('status, id, current_period_end')
                 .eq('user_id', user.id)
                 .eq('status', 'active')
                 .maybeSingle(),
 
-            // 3. Check admin role (RLS: user can only see their own role)
+            // 3. Check admin role
             supabase
                 .from('admin_roles')
                 .select('role')
                 .eq('user_id', user.id)
                 .single(),
 
-            // 4. Fallback: Check payment_requests (RLS: user can only see their own payments)
-            supabase
+            // 4. Fallback: Check payment_requests (optimistically fetch to avoid waterfall)
+            supabaseAdmin
                 .from('payment_requests')
                 .select('id')
                 .eq('user_id', user.id)
