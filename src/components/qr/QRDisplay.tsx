@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import QRCode from "qrcode";
-import { Loader2, Download, ExternalLink, Share2 } from "lucide-react";
+import { Loader2, Download, ExternalLink, Share2, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
 export default function QRDisplay({ url, title, message }: { url: string, title: string, message?: string }) {
     const [qrSrc, setQrSrc] = useState<string>("");
     const [mode, setMode] = useState<'link' | 'text'>('link');
+    const [showActions, setShowActions] = useState(false);
+    const actionsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const data = mode === 'link' ? url : (message || "No message provided");
@@ -17,12 +19,26 @@ export default function QRDisplay({ url, title, message }: { url: string, title:
             width: 400,
             margin: 2,
             color: {
-                dark: "#9B1C1C", // Red primary
-                light: "#FFF1F2", // Blush background
+                dark: "#9B1C1C",
+                light: "#FFF1F2",
             },
             errorCorrectionLevel: 'H'
         }).then(setQrSrc);
     }, [url, mode, message]);
+
+    // Close actions panel when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (actionsRef.current && !actionsRef.current.contains(event.target as Node)) {
+                setShowActions(false);
+            }
+        }
+
+        if (showActions) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [showActions]);
 
     const handleShare = async () => {
         const data = mode === 'link' ? url : (message || "No message provided");
@@ -44,11 +60,9 @@ export default function QRDisplay({ url, title, message }: { url: string, title:
             }
         } catch (err) {
             console.error("Error sharing/copying:", err);
-            // Fallback using execCommand
             try {
                 const textArea = document.createElement("textarea");
                 textArea.value = data;
-                // Avoid scrolling to bottom
                 textArea.style.top = "0";
                 textArea.style.left = "0";
                 textArea.style.position = "fixed";
@@ -79,61 +93,119 @@ export default function QRDisplay({ url, title, message }: { url: string, title:
     if (!qrSrc) return <Loader2 className="animate-spin h-8 w-8 text-red-primary" />;
 
     return (
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center space-y-5" ref={actionsRef}>
+            {/* QR Code — always visible */}
             <div className="bg-white p-4 rounded-xl shadow-lg border-2 border-red-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={qrSrc} alt={`QR Code for ${title}`} className="w-64 h-64 md:w-80 md:h-80" />
             </div>
 
-            <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg">
-                <button
-                    onClick={() => setMode('link')}
-                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${mode === 'link' ? 'bg-white shadow text-red-primary' : 'text-gray-500 hover:text-gray-900'}`}
-                >
-                    Link to Page
-                </button>
-                <button
-                    onClick={() => setMode('text')}
-                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${mode === 'text' ? 'bg-white shadow text-red-primary' : 'text-gray-500 hover:text-gray-900'}`}
-                >
-                    Message Only
-                </button>
-            </div>
-
-            <div className="flex space-x-3">
-                <button
-                    onClick={handleShare}
-                    className="flex items-center px-4 py-2 bg-pink-100 text-pink-600 rounded-full text-sm font-medium hover:bg-pink-200 transition-colors"
-                >
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Share
-                </button>
-
-                <a
-                    href={qrSrc}
-                    download={`love-page-qr-${title}-${mode}.png`}
-                    className="flex items-center px-4 py-2 bg-red-primary text-white rounded-full text-sm font-medium hover:bg-red-accent transition-colors"
-                >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download QR
-                </a>
-                {mode === 'link' && (
-                    <Link
-                        href={url}
-                        target="_blank"
-                        className="flex items-center px-4 py-2 border border-red-200 text-red-primary rounded-full text-sm font-medium hover:bg-red-50 transition-colors"
-                    >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Open Page
-                    </Link>
+            {/* Toggle button to show/hide actions */}
+            <button
+                onClick={() => setShowActions(prev => !prev)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowActions(prev => !prev); }}
+                aria-expanded={showActions}
+                aria-controls="qr-actions-panel"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                style={{
+                    backgroundColor: '#0052cc',
+                    color: '#ffffff',
+                }}
+                onMouseEnter={(e) => { (e.target as HTMLButtonElement).style.backgroundColor = '#003d99'; }}
+                onMouseLeave={(e) => { (e.target as HTMLButtonElement).style.backgroundColor = '#0052cc'; }}
+            >
+                {showActions ? (
+                    <>
+                        <ChevronUp className="w-4 h-4" />
+                        Hide Actions
+                    </>
+                ) : (
+                    <>
+                        <ChevronDown className="w-4 h-4" />
+                        Show Actions
+                    </>
                 )}
-            </div>
+            </button>
 
-            <p className="text-xs text-gray-400 max-w-xs text-center">
-                {mode === 'link'
-                    ? "Scans directly to your Love Page with music & photos."
-                    : "Scans as plain text. The user will see your message immediately."}
-            </p>
+            {/* Collapsible Actions Panel */}
+            <div
+                id="qr-actions-panel"
+                role="region"
+                aria-label="QR Code actions"
+                className={`w-full max-w-sm overflow-hidden transition-all duration-300 ease-in-out ${showActions ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                    }`}
+            >
+                <div className="flex flex-col items-center space-y-4 pt-2 pb-1">
+                    {/* Mode Toggle */}
+                    <div className="flex space-x-2 p-1 rounded-lg" style={{ backgroundColor: '#f0f0f0' }}>
+                        <button
+                            onClick={() => setMode('link')}
+                            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 ${mode === 'link'
+                                ? 'bg-white shadow text-gray-900 font-bold'
+                                : 'text-gray-500 hover:text-gray-900'
+                                }`}
+                        >
+                            Link to Page
+                        </button>
+                        <button
+                            onClick={() => setMode('text')}
+                            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 ${mode === 'text'
+                                ? 'bg-white shadow text-gray-900 font-bold'
+                                : 'text-gray-500 hover:text-gray-900'
+                                }`}
+                        >
+                            Message Only
+                        </button>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap justify-center gap-3">
+                        <button
+                            onClick={handleShare}
+                            className="flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            style={{ backgroundColor: '#f0f0f0', color: '#333333' }}
+                            onMouseEnter={(e) => { (e.target as HTMLButtonElement).style.backgroundColor = '#e0e0e0'; }}
+                            onMouseLeave={(e) => { (e.target as HTMLButtonElement).style.backgroundColor = '#f0f0f0'; }}
+                        >
+                            <Share2 className="w-4 h-4 mr-2" />
+                            Share
+                        </button>
+
+                        <a
+                            href={qrSrc}
+                            download={`love-page-qr-${title}-${mode}.png`}
+                            className="flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            style={{ backgroundColor: '#0052cc', color: '#ffffff' }}
+                            onMouseEnter={(e) => { (e.target as HTMLAnchorElement).style.backgroundColor = '#003d99'; }}
+                            onMouseLeave={(e) => { (e.target as HTMLAnchorElement).style.backgroundColor = '#0052cc'; }}
+                        >
+                            <Download className="w-4 h-4 mr-2" />
+                            Download QR
+                        </a>
+
+                        {mode === 'link' && (
+                            <Link
+                                href={url}
+                                target="_blank"
+                                className="flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                style={{ backgroundColor: '#f0f0f0', color: '#333333' }}
+                                onMouseEnter={(e) => { (e.target as HTMLAnchorElement).style.backgroundColor = '#e0e0e0'; }}
+                                onMouseLeave={(e) => { (e.target as HTMLAnchorElement).style.backgroundColor = '#f0f0f0'; }}
+                            >
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                Open Page
+                            </Link>
+                        )}
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-xs text-gray-400 max-w-xs text-center">
+                        {mode === 'link'
+                            ? "Scans directly to your Love Page with music & photos."
+                            : "Scans as plain text. The user will see your message immediately."}
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }
