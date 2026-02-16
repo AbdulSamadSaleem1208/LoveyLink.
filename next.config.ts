@@ -18,9 +18,32 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true, // Ensuring build passes even if types are imperfect due to rapid dev
   },
-  // eslint: {
-  //   ignoreDuringBuilds: true,
-  // },
+  // Prevent CDN/browser from caching authenticated pages
+  async headers() {
+    return [
+      {
+        source: '/dashboard/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' },
+          { key: 'Pragma', value: 'no-cache' },
+        ],
+      },
+      {
+        source: '/admin/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' },
+          { key: 'Pragma', value: 'no-cache' },
+        ],
+      },
+      {
+        source: '/create',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' },
+          { key: 'Pragma', value: 'no-cache' },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

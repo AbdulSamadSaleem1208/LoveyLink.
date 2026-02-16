@@ -4,6 +4,9 @@ import QRDisplay from "@/components/qr/QRDisplay";
 import Link from "next/link";
 import { CheckCircle, ArrowLeft } from "lucide-react";
 
+// Force dynamic rendering - NEVER cache this page (contains user-specific data)
+export const dynamic = 'force-dynamic';
+
 type Props = {
     params: Promise<{ id: string }>
 }

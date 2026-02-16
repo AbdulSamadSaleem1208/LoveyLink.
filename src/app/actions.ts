@@ -3,17 +3,11 @@
 import { createClient as createSupabaseAdminClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import * as fs from 'fs';
-import * as path from 'path';
 
 function logDebug(message: string) {
-    try {
-        const logPath = path.resolve('debug_log.txt');
-        fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${message}\n`);
-    } catch (e) {
-        console.error("Failed to write log", e);
-    }
+    console.log(`[Debug ${new Date().toISOString()}] ${message}`);
 }
+
 
 export async function checkSubscriptionStatus() {
     try {

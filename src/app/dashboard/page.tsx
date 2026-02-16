@@ -7,6 +7,9 @@ import WelcomeConfetti from "@/components/dashboard/WelcomeConfetti";
 import RefreshSubscriptionButton from "@/components/dashboard/RefreshSubscriptionButton";
 import DeletePageButton from "@/components/dashboard/DeletePageButton";
 
+// Force dynamic rendering - NEVER cache this page (contains user-specific data)
+export const dynamic = 'force-dynamic';
+
 export default async function Dashboard() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

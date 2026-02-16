@@ -4,6 +4,9 @@ import Link from "next/link";
 import { Users, LayoutDashboard, LogOut } from "lucide-react";
 import AdminSignOutButton from "@/components/admin/AdminSignOutButton";
 
+// Force dynamic rendering - NEVER cache admin layout (contains auth guard)
+export const dynamic = 'force-dynamic';
+
 export default async function AdminLayout({
     children,
 }: {
